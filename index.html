@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7ff">
+    <meta name="description" content="学年に合わせて、毎日の勉強を少しずつ。問題に挑戦して学習記録をつけられる学習アプリです。">
+    <title>まなびポケット | 毎日の学習を楽しく</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="メインメニュー">
+        <a class="brand" href="#home" aria-label="まなびポケット ホーム">
+          <span class="brand-mark" aria-hidden="true">ま</span>
+          <span class="brand-name">まなび<span>ポケット</span></span>
+        </a>
+
+        <div class="sidebar-section-label">メニュー</div>
+        <nav class="main-nav">
+          <a class="nav-link active" href="#home" data-view="home" aria-current="page"><span class="nav-icon" aria-hidden="true">⌂</span>ホーム</a>
+          <a class="nav-link" href="#subjects" data-view="subjects"><span class="nav-icon" aria-hidden="true">▦</span>教科をえらぶ</a>
+          <a class="nav-link" href="#progress" data-view="progress"><span class="nav-icon" aria-hidden="true">◷</span>学習のきろく</a>
+        </nav>
+
+        <div class="sidebar-tip">
+          <div class="tip-icon" aria-hidden="true">✦</div>
+          <p class="tip-title">今日のひとこと</p>
+          <p>毎日ちょっとずつ。続けた分だけ、ちゃんと力になるよ。</p>
+        </div>
+
+        <div class="sidebar-bottom">
+          <span class="privacy-icon" aria-hidden="true">▣</span>
+          <span>学習データはこの端末に保存されます</span>
+        </div>
+      </aside>
+
+      <main class="main-content" id="home">
+        <header class="topbar">
+          <div class="mobile-brand">
+            <span class="brand-mark" aria-hidden="true">ま</span>
+            <span class="brand-name">まなび<span>ポケット</span></span>
+          </div>
+          <p class="topbar-date" id="today-date"></p>
+          <button class="profile-button" type="button" aria-label="学年の設定">
+            <span class="avatar" aria-hidden="true">😊</span>
+            <span class="profile-grade" id="profile-grade">小5</span>
+            <span class="chevron" aria-hidden="true">⌄</span>
+          </button>
+        </header>
+
+        <div id="dashboard-view">
+        <section class="welcome-row" aria-labelledby="welcome-title">
+          <div>
+            <p class="eyebrow">YOUR LEARNING SPACE</p>
+            <h1 id="welcome-title">こんにちは！<span id="welcome-grade">小学5年生</span>さん <span class="wave" aria-hidden="true">👋</span></h1>
+            <p class="welcome-subtitle">今日は何を学ぼう？自分のペースで進めよう。</p>
+          </div>
+          <div class="welcome-illustration" aria-hidden="true">
+            <span class="sun">✦</span>
+            <span class="book">📚</span>
+            <span class="sparkle">✧</span>
+          </div>
+        </section>
+
+        <section class="setup-card" aria-label="学年と教科をえらぶ">
+          <div class="setup-heading">
+            <span class="setup-step">1</span>
+            <div>
+              <h2>今日の学習をえらぼう</h2>
+              <p>学年と教科をえらんだら、さっそくスタート！</p>
+            </div>
+          </div>
+          <div class="setup-controls">
+            <label class="select-field">
+              <span>学年</span>
+              <select id="grade-select" aria-label="学年">
+                <optgroup label="小学生">
+                  <option value="小1">小学1年生</option>
+                  <option value="小2">小学2年生</option>
+                  <option value="小3">小学3年生</option>
+                  <option value="小4">小学4年生</option>
+                  <option value="小5" selected>小学5年生</option>
+                  <option value="小6">小学6年生</option>
+                </optgroup>
+                <optgroup label="中学生">
+                  <option value="中1">中学1年生</option>
+                  <option value="中2">中学2年生</option>
+                  <option value="中3">中学3年生</option>
+                </optgroup>
+                <optgroup label="高校生">
+                  <option value="高1">高校1年生</option>
+                  <option value="高2">高校2年生</option>
+                  <option value="高3">高校3年生</option>
+                </optgroup>
+              </select>
+            </label>
+            <label class="select-field">
+              <span>教科</span>
+              <select id="subject-select" aria-label="教科"></select>
+            </label>
+            <button class="start-button" id="start-button" type="button">
+              学習をはじめる <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="stats-grid" aria-label="学習のきろく">
+          <article class="stat-card">
+            <div class="stat-icon purple" aria-hidden="true">◷</div>
+            <div><p>学習した日</p><strong id="days-stat">0<span>日</span></strong></div>
+            <span class="stat-note">これまで</span>
+          </article>
+          <article class="stat-card">
+            <div class="stat-icon yellow" aria-hidden="true">✦</div>
+            <div><p>チャレンジ</p><strong id="sessions-stat">0<span>回</span></strong></div>
+            <span class="stat-note">コツコツ！</span>
+          </article>
+          <article class="stat-card">
+            <div class="stat-icon green" aria-hidden="true">✓</div>
+            <div><p>正解した問題</p><strong id="correct-stat">0<span>問</span></strong></div>
+            <span class="stat-note">ナイス！</span>
+          </article>
+        </section>
+
+        <section class="subjects-section" id="subjects" aria-labelledby="subjects-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">LET'S STUDY</p>
+              <h2 id="subjects-title">教科をえらぶ</h2>
+            </div>
+            <p class="section-caption">すきな教科からはじめよう</p>
+          </div>
+          <div class="subject-grid" id="subject-grid"></div>
+        </section>
+
+        <section class="encouragement" aria-label="応援メッセージ">
+          <span class="encouragement-icon" aria-hidden="true">🌱</span>
+          <p><strong>「わかった！」をひとつずつ。</strong><br><span>今日の一歩が、明日の自信につながるよ。</span></p>
+          <span class="encouragement-decoration" aria-hidden="true">✦</span>
+        </section>
+        </div>
+        <section class="history-page" id="progress" aria-labelledby="history-title" hidden>
+          <div class="history-heading">
+            <p class="eyebrow">YOUR PROGRESS</p>
+            <h1 id="history-title">学習のきろく</h1>
+            <p>これまでのチャレンジをふりかえろう。</p>
+          </div>
+          <div class="stats-grid history-stats" aria-label="学習のまとめ">
+            <article class="stat-card">
+              <div class="stat-icon purple" aria-hidden="true">◷</div>
+              <div><p>学習した日</p><strong id="history-days-stat">0<span>日</span></strong></div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-icon yellow" aria-hidden="true">✦</div>
+              <div><p>チャレンジ</p><strong id="history-sessions-stat">0<span>回</span></strong></div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-icon green" aria-hidden="true">✓</div>
+              <div><p>正解した問題</p><strong id="history-correct-stat">0<span>問</span></strong></div>
+            </article>
+          </div>
+          <div class="history-list-card">
+            <div class="history-list-heading">
+              <h2>チャレンジのきろく</h2>
+              <span>新しい順</span>
+            </div>
+            <div class="history-list" id="history-list"></div>
+          </div>
+        </section>
+        <p class="storage-notice" id="storage-notice" role="status" aria-live="polite" hidden>このブラウザでは学習記録を保存できません。ページを閉じると記録が消える場合があります。</p>
+        <footer class="page-footer">まなびポケット <span>·</span> 学習記録はこのブラウザ内に保存されます</footer>
+      </main>
+    </div>
+    <nav class="mobile-nav" aria-label="メインメニュー">
+      <a class="nav-link active" href="#home" data-view="home" aria-current="page"><span class="nav-icon" aria-hidden="true">⌂</span>ホーム</a>
+      <a class="nav-link" href="#subjects" data-view="subjects"><span class="nav-icon" aria-hidden="true">▦</span>教科</a>
+      <a class="nav-link" href="#progress" data-view="progress"><span class="nav-icon" aria-hidden="true">◷</span>きろく</a>
+    </nav>
+
+    <dialog class="quiz-dialog" id="quiz-dialog" aria-labelledby="quiz-title">
+      <div class="quiz-panel">
+        <div class="quiz-topline">
+          <span class="quiz-subject" id="quiz-subject"></span>
+          <button class="icon-button" id="close-quiz" type="button" aria-label="閉じる">×</button>
+        </div>
+        <div class="quiz-progress-track"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+        <p class="quiz-count" id="quiz-count"></p>
+        <h2 class="quiz-question" id="quiz-title"></h2>
+        <div class="quiz-options" id="quiz-options"></div>
+        <div class="quiz-feedback" id="quiz-feedback" role="status" aria-live="polite"></div>
+        <button class="quiz-next-button" id="quiz-next" type="button" disabled>こたえをえらんでね</button>
+      </div>
+    </dialog>
+  </body>
+</html>
