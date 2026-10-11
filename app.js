@@ -1,5 +1,6 @@
 const gradeSelect = document.querySelector("#grade-select");
 const subjectSelect = document.querySelector("#subject-select");
+const unitSelect = document.querySelector("#unit-select");
 const subjectGrid = document.querySelector("#subject-grid");
 const quizDialog = document.querySelector("#quiz-dialog");
 const quizTitle = document.querySelector("#quiz-title");
@@ -53,88 +54,88 @@ const subjectsByGrade = {
 const questions = {
   elementary: {
     math: [
-      { prompt: "36 ÷ 4 はいくつ？", options: ["8", "9", "10", "12"], answer: 1, explanation: "4 × 9 = 36 だから、36 ÷ 4 = 9 だね。" },
-      { prompt: "1辺が5cmの正方形のまわりの長さは？", options: ["10cm", "15cm", "20cm", "25cm"], answer: 2, explanation: "正方形は4辺が同じ長さ。5 × 4 = 20cmだよ。" },
-      { prompt: "0.7 + 0.8 はいくつ？", options: ["1.3", "1.4", "1.5", "1.6"], answer: 2, explanation: "小数点の位置をそろえて計算すると、0.7 + 0.8 = 1.5。" },
+      { unit: "わり算", prompt: "36 ÷ 4 はいくつ？", options: ["8", "9", "10", "12"], answer: 1, explanation: "4 × 9 = 36 だから、36 ÷ 4 = 9 だね。" },
+      { unit: "長方形と正方形", prompt: "1辺が5cmの正方形のまわりの長さは？", options: ["10cm", "15cm", "20cm", "25cm"], answer: 2, explanation: "正方形は4辺が同じ長さ。5 × 4 = 20cmだよ。" },
+      { unit: "小数のたし算", prompt: "0.7 + 0.8 はいくつ？", options: ["1.3", "1.4", "1.5", "1.6"], answer: 2, explanation: "小数点の位置をそろえて計算すると、0.7 + 0.8 = 1.5。" },
     ],
     japanese: [
-      { prompt: "「美しい」の反対の意味に近い言葉はどれ？", options: ["きれい", "うつくしい", "みにくい", "あざやか"], answer: 2, explanation: "「みにくい」は「美しい」と反対の意味を表す言葉だよ。" },
-      { prompt: "「鳥が空を飛ぶ。」の主語はどれ？", options: ["鳥が", "空を", "飛ぶ", "空"], answer: 0, explanation: "「だれが・何が」にあたる「鳥が」が主語だね。" },
-      { prompt: "「走る」をていねいな言い方にすると？", options: ["走った", "走ります", "走ろう", "走れば"], answer: 1, explanation: "「走ります」は「走る」をていねいにした言い方だよ。" },
+      { unit: "反対の意味の言葉", prompt: "「美しい」の反対の意味に近い言葉はどれ？", options: ["きれい", "うつくしい", "みにくい", "あざやか"], answer: 2, explanation: "「みにくい」は「美しい」と反対の意味を表す言葉だよ。" },
+      { unit: "主語と述語", prompt: "「鳥が空を飛ぶ。」の主語はどれ？", options: ["鳥が", "空を", "飛ぶ", "空"], answer: 0, explanation: "「だれが・何が」にあたる「鳥が」が主語だね。" },
+      { unit: "ていねいな言い方", prompt: "「走る」をていねいな言い方にすると？", options: ["走った", "走ります", "走ろう", "走れば"], answer: 1, explanation: "「走ります」は「走る」をていねいにした言い方だよ。" },
     ],
     science: [
-      { prompt: "植物が日光を受けて、葉で養分をつくるはたらきは？", options: ["呼吸", "発芽", "光合成", "蒸発"], answer: 2, explanation: "植物は日光を使って、葉で養分をつくる。これを光合成というよ。" },
-      { prompt: "水がこおり始める温度は何度？", options: ["0℃", "10℃", "50℃", "100℃"], answer: 0, explanation: "水はふつう、0℃でこおり始めるよ。" },
-      { prompt: "磁石に引きつけられるものはどれ？", options: ["木のつくえ", "鉄のくぎ", "紙のノート", "ガラスのコップ"], answer: 1, explanation: "鉄は磁石に引きつけられる金属だよ。" },
+      { unit: "植物のはたらき", prompt: "植物が日光を受けて、葉で養分をつくるはたらきは？", options: ["呼吸", "発芽", "光合成", "蒸発"], answer: 2, explanation: "植物は日光を使って、葉で養分をつくる。これを光合成というよ。" },
+      { unit: "水のすがた", prompt: "水がこおり始める温度は何度？", options: ["0℃", "10℃", "50℃", "100℃"], answer: 0, explanation: "水はふつう、0℃でこおり始めるよ。" },
+      { unit: "磁石のせいしつ", prompt: "磁石に引きつけられるものはどれ？", options: ["木のつくえ", "鉄のくぎ", "紙のノート", "ガラスのコップ"], answer: 1, explanation: "鉄は磁石に引きつけられる金属だよ。" },
     ],
     social: [
-      { prompt: "日本の都道府県の数はいくつ？", options: ["43", "45", "47", "50"], answer: 2, explanation: "日本には1都1道2府43県、合わせて47の都道府県があるよ。" },
-      { prompt: "地図で、ふつう上の方が表す方角は？", options: ["東", "西", "南", "北"], answer: 3, explanation: "地図は上が北、下が南を表すことが多いよ。" },
-      { prompt: "日本でいちばん高い山はどれ？", options: ["北岳", "富士山", "奥穂高岳", "槍ヶ岳"], answer: 1, explanation: "富士山は標高3,776mで、日本でいちばん高い山だよ。" },
+      { unit: "都道府県", prompt: "日本の都道府県の数はいくつ？", options: ["43", "45", "47", "50"], answer: 2, explanation: "日本には1都1道2府43県、合わせて47の都道府県があるよ。" },
+      { unit: "地図の見方", prompt: "地図で、ふつう上の方が表す方角は？", options: ["東", "西", "南", "北"], answer: 3, explanation: "地図は上が北、下が南を表すことが多いよ。" },
+      { unit: "日本の地形", prompt: "日本でいちばん高い山はどれ？", options: ["北岳", "富士山", "奥穂高岳", "槍ヶ岳"], answer: 1, explanation: "富士山は標高3,776mで、日本でいちばん高い山だよ。" },
     ],
     life: [
-      { prompt: "通学路を歩くとき、安全のために気をつけることは？", options: ["左右をたしかめて歩く", "車道の真ん中を歩く", "信号を見ない", "走って道路をわたる"], answer: 0, explanation: "道路をわたるときは左右をたしかめ、安全を確認しよう。" },
-      { prompt: "植物を育てるとき、土がかわいていたら何をする？", options: ["水をあげる", "土をける", "葉をとる", "箱にしまう"], answer: 0, explanation: "植物が育つように、土の様子を見て水をあげよう。" },
-      { prompt: "学校で使った道具を次の人も使えるようにするには？", options: ["もとの場所に片づける", "床に置く", "持ち帰る", "かくす"], answer: 0, explanation: "道具をもとの場所に片づけると、みんなが使いやすいね。" },
+      { unit: "安全な登下校", prompt: "通学路を歩くとき、安全のために気をつけることは？", options: ["左右をたしかめて歩く", "車道の真ん中を歩く", "信号を見ない", "走って道路をわたる"], answer: 0, explanation: "道路をわたるときは左右をたしかめ、安全を確認しよう。" },
+      { unit: "植物のせわ", prompt: "植物を育てるとき、土がかわいていたら何をする？", options: ["水をあげる", "土をける", "葉をとる", "箱にしまう"], answer: 0, explanation: "植物が育つように、土の様子を見て水をあげよう。" },
+      { unit: "学校の道具", prompt: "学校で使った道具を次の人も使えるようにするには？", options: ["もとの場所に片づける", "床に置く", "持ち帰る", "かくす"], answer: 0, explanation: "道具をもとの場所に片づけると、みんなが使いやすいね。" },
     ],
     english: [
-      { prompt: "「りんご」を表す英語はどれ？", options: ["apple", "book", "dog", "blue"], answer: 0, explanation: "appleは「りんご」という意味だよ。" },
-      { prompt: "「こんにちは」とあいさつするときに使う英語は？", options: ["Hello.", "Good night.", "Thank you.", "Goodbye."], answer: 0, explanation: "Helloは、出会ったときのあいさつだよ。" },
-      { prompt: "「私はユキです」を表す英文は？", options: ["I am Yuki.", "I is Yuki.", "You am Yuki.", "I are Yuki."], answer: 0, explanation: "主語がIのときはbe動詞amを使うよ。" },
+      { unit: "身近なものの英語", prompt: "「りんご」を表す英語はどれ？", options: ["apple", "book", "dog", "blue"], answer: 0, explanation: "appleは「りんご」という意味だよ。" },
+      { unit: "あいさつ", prompt: "「こんにちは」とあいさつするときに使う英語は？", options: ["Hello.", "Good night.", "Thank you.", "Goodbye."], answer: 0, explanation: "Helloは、出会ったときのあいさつだよ。" },
+      { unit: "be動詞", prompt: "「私はユキです」を表す英文は？", options: ["I am Yuki.", "I is Yuki.", "You am Yuki.", "I are Yuki."], answer: 0, explanation: "主語がIのときはbe動詞amを使うよ。" },
     ],
   },
   middle: {
     math: [
-      { prompt: "方程式 3x + 5 = 20 の x はいくつ？", options: ["3", "5", "8", "15"], answer: 1, explanation: "両辺から5を引いて3x=15。両辺を3で割るとx=5だよ。" },
-      { prompt: "半径3cmの円の面積は？（円周率はπ）", options: ["3π cm²", "6π cm²", "9π cm²", "12π cm²"], answer: 2, explanation: "円の面積は半径×半径×π。3×3×π=9π cm²だよ。" },
-      { prompt: "サイコロを1回振るとき、偶数が出る確率は？", options: ["1/6", "1/3", "1/2", "2/3"], answer: 2, explanation: "偶数は2・4・6の3つ。全部で6通りだから3/6=1/2だよ。" },
+      { unit: "方程式", prompt: "方程式 3x + 5 = 20 の x はいくつ？", options: ["3", "5", "8", "15"], answer: 1, explanation: "両辺から5を引いて3x=15。両辺を3で割るとx=5だよ。" },
+      { unit: "円の面積", prompt: "半径3cmの円の面積は？（円周率はπ）", options: ["3π cm²", "6π cm²", "9π cm²", "12π cm²"], answer: 2, explanation: "円の面積は半径×半径×π。3×3×π=9π cm²だよ。" },
+      { unit: "確率", prompt: "サイコロを1回振るとき、偶数が出る確率は？", options: ["1/6", "1/3", "1/2", "2/3"], answer: 2, explanation: "偶数は2・4・6の3つ。全部で6通りだから3/6=1/2だよ。" },
     ],
     japanese: [
-      { prompt: "「しかし」は、文と文をどのようにつなぐ接続語？", options: ["理由", "逆接", "例示", "追加"], answer: 1, explanation: "「しかし」は、前の内容と反対の内容をつなぐ逆接の接続語だよ。" },
-      { prompt: "「古典」の読み方はどれ？", options: ["こてん", "ふるてん", "こでん", "ふるのり"], answer: 0, explanation: "「古典」は「こてん」と読むよ。" },
-      { prompt: "「彼はまるで太陽のように明るい」は何の表現？", options: ["擬人法", "比喩（直喩）", "倒置法", "反復法"], answer: 1, explanation: "「まるで〜のように」とたとえているので、直喩だね。" },
+      { unit: "接続語", prompt: "「しかし」は、文と文をどのようにつなぐ接続語？", options: ["理由", "逆接", "例示", "追加"], answer: 1, explanation: "「しかし」は、前の内容と反対の内容をつなぐ逆接の接続語だよ。" },
+      { unit: "古典の読み", prompt: "「古典」の読み方はどれ？", options: ["こてん", "ふるてん", "こでん", "ふるのり"], answer: 0, explanation: "「古典」は「こてん」と読むよ。" },
+      { unit: "比喩表現", prompt: "「彼はまるで太陽のように明るい」は何の表現？", options: ["擬人法", "比喩（直喩）", "倒置法", "反復法"], answer: 1, explanation: "「まるで〜のように」とたとえているので、直喩だね。" },
     ],
     english: [
-      { prompt: "「私は毎日テニスをします」を表す英文は？", options: ["I play tennis every day.", "I plays tennis every day.", "I am play tennis every day.", "I playing tennis every day."], answer: 0, explanation: "主語がIの現在形では動詞はplay。every dayは「毎日」だよ。" },
-      { prompt: "「図書館」を意味する英単語はどれ？", options: ["museum", "library", "station", "kitchen"], answer: 1, explanation: "libraryは「図書館」という意味だよ。" },
-      { prompt: "They (　) watching a movie now. に入る語は？", options: ["is", "am", "are", "be"], answer: 2, explanation: "主語がTheyなので、be動詞はare。現在進行形はare watchingだよ。" },
+      { unit: "一般動詞", prompt: "「私は毎日テニスをします」を表す英文は？", options: ["I play tennis every day.", "I plays tennis every day.", "I am play tennis every day.", "I playing tennis every day."], answer: 0, explanation: "主語がIの現在形では動詞はplay。every dayは「毎日」だよ。" },
+      { unit: "場所を表す単語", prompt: "「図書館」を意味する英単語はどれ？", options: ["museum", "library", "station", "kitchen"], answer: 1, explanation: "libraryは「図書館」という意味だよ。" },
+      { unit: "現在進行形", prompt: "They (　) watching a movie now. に入る語は？", options: ["is", "am", "are", "be"], answer: 2, explanation: "主語がTheyなので、be動詞はare。現在進行形はare watchingだよ。" },
     ],
     science: [
-      { prompt: "電流の単位はどれ？", options: ["ボルト（V）", "アンペア（A）", "オーム（Ω）", "ワット（W）"], answer: 1, explanation: "電流の単位はアンペア（A）。電圧はボルト、抵抗はオームだよ。" },
-      { prompt: "酸性の水溶液に青色リトマス紙をつけると？", options: ["赤色になる", "青色のまま", "白色になる", "緑色になる"], answer: 0, explanation: "酸性の水溶液に青色リトマス紙をつけると赤色に変わるよ。" },
-      { prompt: "地球が太陽のまわりを1周するのにかかる時間は？", options: ["約1日", "約1か月", "約1年", "約10年"], answer: 2, explanation: "地球は約1年かけて太陽のまわりを1周するよ。" },
+      { unit: "電流", prompt: "電流の単位はどれ？", options: ["ボルト（V）", "アンペア（A）", "オーム（Ω）", "ワット（W）"], answer: 1, explanation: "電流の単位はアンペア（A）。電圧はボルト、抵抗はオームだよ。" },
+      { unit: "水溶液の性質", prompt: "酸性の水溶液に青色リトマス紙をつけると？", options: ["赤色になる", "青色のまま", "白色になる", "緑色になる"], answer: 0, explanation: "酸性の水溶液に青色リトマス紙をつけると赤色に変わるよ。" },
+      { unit: "地球と太陽", prompt: "地球が太陽のまわりを1周するのにかかる時間は？", options: ["約1日", "約1か月", "約1年", "約10年"], answer: 2, explanation: "地球は約1年かけて太陽のまわりを1周するよ。" },
     ],
     social: [
-      { prompt: "日本国憲法が施行された年は？", options: ["1889年", "1945年", "1947年", "1952年"], answer: 2, explanation: "日本国憲法は1946年に公布され、1947年5月3日に施行されたよ。" },
-      { prompt: "赤道に近い地域に広がる気候帯は？", options: ["寒帯", "温帯", "乾燥帯", "熱帯"], answer: 3, explanation: "赤道付近は一年を通して気温が高く、熱帯に分類されるよ。" },
-      { prompt: "日本の国会をつくる2つの議院は？", options: ["上院と下院", "衆議院と参議院", "国民院と政府院", "県議会と市議会"], answer: 1, explanation: "日本の国会は、衆議院と参議院の二院制だよ。" },
+      { unit: "日本国憲法", prompt: "日本国憲法が施行された年は？", options: ["1889年", "1945年", "1947年", "1952年"], answer: 2, explanation: "日本国憲法は1946年に公布され、1947年5月3日に施行されたよ。" },
+      { unit: "世界の気候", prompt: "赤道に近い地域に広がる気候帯は？", options: ["寒帯", "温帯", "乾燥帯", "熱帯"], answer: 3, explanation: "赤道付近は一年を通して気温が高く、熱帯に分類されるよ。" },
+      { unit: "日本の政治", prompt: "日本の国会をつくる2つの議院は？", options: ["上院と下院", "衆議院と参議院", "国民院と政府院", "県議会と市議会"], answer: 1, explanation: "日本の国会は、衆議院と参議院の二院制だよ。" },
     ],
   },
   high: {
     math: [
-      { prompt: "関数 y = 2x² を x で微分すると？", options: ["2x", "4x", "x²", "4x²"], answer: 1, explanation: "べき乗の微分より、(2x²)' = 2 × 2x = 4xだよ。" },
-      { prompt: "log₂ 8 の値は？", options: ["2", "3", "4", "8"], answer: 1, explanation: "2³=8なので、log₂ 8=3だよ。" },
-      { prompt: "初項2、公差3の等差数列の第5項は？", options: ["11", "12", "14", "17"], answer: 2, explanation: "第5項は2 + (5−1)×3 = 14だよ。" },
+      { unit: "微分", prompt: "関数 y = 2x² を x で微分すると？", options: ["2x", "4x", "x²", "4x²"], answer: 1, explanation: "べき乗の微分より、(2x²)' = 2 × 2x = 4xだよ。" },
+      { unit: "対数", prompt: "log₂ 8 の値は？", options: ["2", "3", "4", "8"], answer: 1, explanation: "2³=8なので、log₂ 8=3だよ。" },
+      { unit: "等差数列", prompt: "初項2、公差3の等差数列の第5項は？", options: ["11", "12", "14", "17"], answer: 2, explanation: "第5項は2 + (5−1)×3 = 14だよ。" },
     ],
     english: [
-      { prompt: "空欄に入る語は？ I have lived here (　) 2020.", options: ["for", "since", "during", "by"], answer: 1, explanation: "sinceは「〜以来」。2020のような始まった時点と使うよ。" },
-      { prompt: "「環境」を意味する英単語はどれ？", options: ["environment", "government", "development", "movement"], answer: 0, explanation: "environmentは「環境」という意味だよ。" },
-      { prompt: "The book (　) by many students. に入る語は？", options: ["read", "reads", "is read", "is reading"], answer: 2, explanation: "「本が読まれる」という受け身の文なので、is readが入るよ。" },
+      { unit: "現在完了", prompt: "空欄に入る語は？ I have lived here (　) 2020.", options: ["for", "since", "during", "by"], answer: 1, explanation: "sinceは「〜以来」。2020のような始まった時点と使うよ。" },
+      { unit: "環境に関する語彙", prompt: "「環境」を意味する英単語はどれ？", options: ["environment", "government", "development", "movement"], answer: 0, explanation: "environmentは「環境」という意味だよ。" },
+      { unit: "受け身", prompt: "The book (　) by many students. に入る語は？", options: ["read", "reads", "is read", "is reading"], answer: 2, explanation: "「本が読まれる」という受け身の文なので、is readが入るよ。" },
     ],
     physics: [
-      { prompt: "質量2kgの物体に、加速度3m/s²を生じさせる力は？", options: ["1.5N", "5N", "6N", "9N"], answer: 2, explanation: "運動方程式 F=ma より、2×3=6Nだよ。" },
-      { prompt: "電圧12V、抵抗4Ωの回路に流れる電流は？", options: ["0.3A", "3A", "8A", "48A"], answer: 1, explanation: "オームの法則 I=V/R より、12÷4=3Aだよ。" },
-      { prompt: "波の速さを表す式はどれ？（振動数f、波長λ）", options: ["v = fλ", "v = f/λ", "v = λ/f", "v = f + λ"], answer: 0, explanation: "波の速さは、振動数×波長で v=fλ と表せるよ。" },
+      { unit: "運動方程式", prompt: "質量2kgの物体に、加速度3m/s²を生じさせる力は？", options: ["1.5N", "5N", "6N", "9N"], answer: 2, explanation: "運動方程式 F=ma より、2×3=6Nだよ。" },
+      { unit: "オームの法則", prompt: "電圧12V、抵抗4Ωの回路に流れる電流は？", options: ["0.3A", "3A", "8A", "48A"], answer: 1, explanation: "オームの法則 I=V/R より、12÷4=3Aだよ。" },
+      { unit: "波の性質", prompt: "波の速さを表す式はどれ？（振動数f、波長λ）", options: ["v = fλ", "v = f/λ", "v = λ/f", "v = f + λ"], answer: 0, explanation: "波の速さは、振動数×波長で v=fλ と表せるよ。" },
     ],
     japanese: [
-      { prompt: "「杞憂」の意味として正しいものは？", options: ["思いがけない幸運", "必要のない心配", "強い決意", "昔の思い出"], answer: 1, explanation: "杞憂は、心配する必要のないことをあれこれ心配することだよ。" },
-      { prompt: "「山のように積まれた本」は何の表現？", options: ["直喩", "隠喩", "擬人法", "倒置法"], answer: 0, explanation: "「山のように」と「ように」を使ってたとえる直喩だよ。" },
-      { prompt: "文章の中で、筆者の主張を支える具体例の役割は？", options: ["主張を分かりやすくする", "題名を説明する", "段落数を増やす", "結論を隠す"], answer: 0, explanation: "具体例は、主張の内容を読者に分かりやすく伝える助けになるよ。" },
+      { unit: "語彙と意味", prompt: "「杞憂」の意味として正しいものは？", options: ["思いがけない幸運", "必要のない心配", "強い決意", "昔の思い出"], answer: 1, explanation: "杞憂は、心配する必要のないことをあれこれ心配することだよ。" },
+      { unit: "比喩表現", prompt: "「山のように積まれた本」は何の表現？", options: ["直喩", "隠喩", "擬人法", "倒置法"], answer: 0, explanation: "「山のように」と「ように」を使ってたとえる直喩だよ。" },
+      { unit: "文章の要旨", prompt: "文章の中で、筆者の主張を支える具体例の役割は？", options: ["主張を分かりやすくする", "題名を説明する", "段落数を増やす", "結論を隠す"], answer: 0, explanation: "具体例は、主張の内容を読者に分かりやすく伝える助けになるよ。" },
     ],
     science: [
-      { prompt: "水の化学式はどれ？", options: ["CO₂", "O₂", "H₂O", "NaCl"], answer: 2, explanation: "水は水素原子2つと酸素原子1つからできていて、化学式はH₂Oだよ。" },
-      { prompt: "原子核を構成する粒子の組み合わせは？", options: ["陽子と中性子", "陽子と電子", "電子と中性子", "電子だけ"], answer: 0, explanation: "原子核は、正の電荷をもつ陽子と電荷をもたない中性子からできているよ。" },
-      { prompt: "酸と塩基が反応して水と塩ができる反応は？", options: ["酸化", "中和", "分解", "重合"], answer: 1, explanation: "酸と塩基が反応して互いの性質を打ち消し、水と塩を生じる反応を中和というよ。" },
+      { unit: "水の化学式", prompt: "水の化学式はどれ？", options: ["CO₂", "O₂", "H₂O", "NaCl"], answer: 2, explanation: "水は水素原子2つと酸素原子1つからできていて、化学式はH₂Oだよ。" },
+      { unit: "原子のつくり", prompt: "原子核を構成する粒子の組み合わせは？", options: ["陽子と中性子", "陽子と電子", "電子と中性子", "電子だけ"], answer: 0, explanation: "原子核は、正の電荷をもつ陽子と電荷をもたない中性子からできているよ。" },
+      { unit: "中和", prompt: "酸と塩基が反応して水と塩ができる反応は？", options: ["酸化", "中和", "分解", "重合"], answer: 1, explanation: "酸と塩基が反応して互いの性質を打ち消し、水と塩を生じる反応を中和というよ。" },
     ],
   },
 };
@@ -224,6 +225,199 @@ const gradeQuestions = {
   },
 };
 
+function greatestCommonDivisor(left, right) {
+  return right === 0 ? left : greatestCommonDivisor(right, left % right);
+}
+
+function formatFraction(numerator, denominator) {
+  const divisor = greatestCommonDivisor(numerator, denominator);
+  const reducedNumerator = numerator / divisor;
+  const reducedDenominator = denominator / divisor;
+  return reducedDenominator === 1 ? String(reducedNumerator) : `${reducedNumerator}/${reducedDenominator}`;
+}
+
+function generatedQuestion(unit, prompt, answer, distractors, explanation) {
+  const options = [...new Set([String(answer), ...distractors.map(String)])].slice(0, 4);
+  if (options.length !== 4) throw new Error(`選択肢が不足しています: ${unit} - ${prompt}`);
+  return { unit, prompt, options, answer: 0, explanation };
+}
+
+function shuffled(items) {
+  const result = [...items];
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
+  }
+  return result;
+}
+
+function makeSixthGradeMathQuestions() {
+  const banks = {
+    "分数のかけ算・わり算": [],
+    "比と比例・反比例": [],
+    "速さ・単位量あたりの大きさ": [],
+    "円の面積・体積": [],
+    "拡大図・縮図と対称な図形": [],
+    "データの活用": [],
+  };
+
+  for (let index = 0; index < 30; index += 1) {
+    const firstNumerator = 2 + (index % 7);
+    const firstDenominator = 3 + (index % 5);
+    const secondNumerator = 2 + ((index * 3) % 7);
+    const secondDenominator = 2 + ((index * 2) % 7);
+    const isDivision = index % 2 === 1;
+    const resultNumerator = isDivision
+      ? firstNumerator * secondDenominator
+      : firstNumerator * secondNumerator;
+    const resultDenominator = isDivision
+      ? firstDenominator * secondNumerator
+      : firstDenominator * secondDenominator;
+    const answer = formatFraction(resultNumerator, resultDenominator);
+    const unit = banks["分数のかけ算・わり算"];
+    unit.push(generatedQuestion(
+      "分数のかけ算・わり算",
+      `${firstNumerator}/${firstDenominator} ${isDivision ? "÷" : "×"} ${secondNumerator}/${secondDenominator} を計算しよう。`,
+      answer,
+      [
+        formatFraction(resultNumerator + resultDenominator, resultDenominator),
+        formatFraction(resultNumerator + resultDenominator * 2, resultDenominator),
+        formatFraction(resultNumerator + resultDenominator * 3, resultDenominator),
+      ],
+      isDivision
+        ? `わり算は、わる数の逆数をかけます。答えは ${answer} です。`
+        : `分子どうし、分母どうしをかけて約分します。答えは ${answer} です。`,
+    ));
+
+    const scale = 2 + index;
+    const ratioLeft = 2 + (index % 5);
+    const ratioRight = 3 + ((index * 2) % 6);
+    const firstValue = ratioLeft * scale;
+    const directValue = ratioRight * scale;
+    const inverseValue = scale * ratioRight * 2;
+    const ratioPrompt = index % 3;
+    const ratioQuestion = ratioPrompt === 0
+      ? `xとyの比は${ratioLeft}:${ratioRight}です。x=${firstValue + ratioLeft}のとき、yはいくつ？`
+      : ratioPrompt === 1
+        ? `x:y=${ratioLeft}:${ratioRight}のとき、x=${firstValue}ならyはいくつ？`
+        : `xとyは反比例し、x=${scale}のときy=${inverseValue / scale}です。x=${scale * 2}のとき、yはいくつ？`;
+    const computedRatioAnswer = ratioPrompt === 0
+      ? directValue + ratioRight
+      : ratioPrompt === 1
+        ? directValue
+        : inverseValue / (scale * 2);
+    banks["比と比例・反比例"].push(generatedQuestion(
+      "比と比例・反比例",
+      ratioQuestion,
+      computedRatioAnswer,
+      [computedRatioAnswer + 1, computedRatioAnswer + 2, computedRatioAnswer + 3],
+      ratioPrompt === 2
+        ? "反比例では、xとyの積が一定です。"
+        : "比例では、xが同じ倍率で変わるとyも同じ倍率で変わります。",
+    ));
+
+    const seconds = 20 + index * 2;
+    const speed = 2 + Math.floor(index / 10);
+    const distance = speed * seconds;
+    banks["速さ・単位量あたりの大きさ"].push(generatedQuestion(
+      "速さ・単位量あたりの大きさ",
+      `${distance}mを${seconds}秒で進みました。速さは毎秒何m？`,
+      `${speed}m/秒`,
+      [`${speed + 1}m/秒`, `${speed + 2}m/秒`, `${speed + 3}m/秒`],
+      `速さは、道のりを時間でわって求めます。${distance} ÷ ${seconds} = ${speed}m/秒です。`,
+    ));
+
+    const radius = 2 + index;
+    const length = 3 + index;
+    const width = 2 + ((index * 2) % 7);
+    const height = 2 + ((index * 3) % 6);
+    const geometryType = index % 2;
+    const geometryAnswer = geometryType === 0 ? `${radius * radius}π cm²` : `${length * width * height} cm³`;
+    const geometryPrompt = geometryType === 0
+      ? `半径${radius}cmの円の面積を、円周率πを使って表そう。`
+      : `たて${length}cm、横${width}cm、高さ${height}cmの直方体の体積は？`;
+    banks["円の面積・体積"].push(generatedQuestion(
+      "円の面積・体積",
+      geometryPrompt,
+      geometryAnswer,
+      geometryType === 0
+        ? [`${(radius + 2) ** 2}π cm²`, `${Math.max(1, radius - 1) ** 2}π cm²`, `${radius * radius + radius}π cm²`]
+        : [`${length * width} cm³`, `${length + width + height} cm³`, `${length * width * height + 5} cm³`],
+      geometryType === 0
+        ? "円の面積は、半径×半径×円周率で求めます。"
+        : "直方体の体積は、たて×横×高さで求めます。",
+    ));
+
+    const drawingScale = 2 + index;
+    const drawingLength = 3 + index;
+    const shapeNames = ["正方形", "長方形", "正三角形", "正六角形", "ひし形"];
+    const symmetryCounts = [4, 2, 3, 6, 2];
+    const rotationalOrders = [4, 2, 3, 6, 2];
+    const vertexCounts = [4, 4, 3, 6, 4];
+    const shapeIndex = index % shapeNames.length;
+    const scaleOrSymmetry = index % 2 === 0;
+    const symmetryQuestionType = Math.floor(index / 10);
+    const symmetryPrompt = symmetryQuestionType === 0
+      ? `線対称な${shapeNames[shapeIndex]}の対称の軸は何本？`
+      : symmetryQuestionType === 1
+        ? `${shapeNames[shapeIndex]}は、1回転するまでに何回重なる？`
+        : `${shapeNames[shapeIndex]}の頂点は何個？`;
+    const symmetryAnswer = symmetryQuestionType === 0
+      ? symmetryCounts[shapeIndex]
+      : symmetryQuestionType === 1
+        ? rotationalOrders[shapeIndex]
+        : vertexCounts[shapeIndex];
+    const geometryScaleAnswer = `${drawingLength * drawingScale}cm`;
+    banks["拡大図・縮図と対称な図形"].push(generatedQuestion(
+      "拡大図・縮図と対称な図形",
+      scaleOrSymmetry
+        ? `縮尺1:${drawingScale}の図で、長さ${drawingLength}cmの辺は実際には何cm？`
+        : symmetryPrompt,
+      scaleOrSymmetry ? geometryScaleAnswer : symmetryAnswer,
+      scaleOrSymmetry
+        ? [`${drawingLength * drawingScale + 1}cm`, `${drawingLength * drawingScale + 2}cm`, `${drawingLength * drawingScale + 3}cm`]
+        : [symmetryAnswer + 1, Math.max(0, symmetryAnswer - 1), symmetryAnswer + 2],
+      scaleOrSymmetry
+        ? `実際の長さは、図の長さに縮尺の分母をかけます。${drawingLength} × ${drawingScale} = ${drawingLength * drawingScale}cmです。`
+        : `${symmetryPrompt.replace(/[？?]$/, "")} ${symmetryAnswer}です。`,
+    ));
+
+    const dataValues = [
+      3 + (index % 9),
+      8 + (index % 7),
+      12 + (index % 5),
+      17 + (index % 6),
+      22 + (index % 8),
+    ].sort((left, right) => left - right);
+    const dataType = index % 3;
+    const dataAnswer = dataType === 0
+      ? dataValues.reduce((sum, value) => sum + value, 0) / dataValues.length
+      : dataType === 1
+        ? dataValues[2]
+        : dataValues[dataValues.length - 1] - dataValues[0];
+    const dataName = dataType === 0 ? "平均値" : dataType === 1 ? "中央値" : "範囲";
+    banks["データの活用"].push(generatedQuestion(
+      "データの活用",
+      `次のデータの${dataName}はいくつ？ ${dataValues.join("、")}`,
+      dataAnswer,
+      [dataAnswer + 2, Math.max(0, dataAnswer - 2), dataAnswer + 5],
+      dataType === 0
+        ? "平均値は、すべての値の合計を個数でわって求めます。"
+        : dataType === 1
+          ? "中央値は、値を小さい順に並べたときの中央の値です。"
+          : "範囲は、最大値から最小値をひいて求めます。",
+    ));
+  }
+
+  return banks;
+}
+
+const customQuestionBanks = {
+  小6: {
+    math: makeSixthGradeMathQuestions(),
+  },
+};
+
 const stageForGrade = (grade) => grade.startsWith("小") ? "elementary" : grade.startsWith("中") ? "middle" : "high";
 const gradeLongName = (grade) => {
   const school = grade.slice(0, 1);
@@ -241,6 +435,7 @@ let questionIndex = 0;
 let correctAnswers = 0;
 let answered = false;
 let activeSubject = null;
+let activeUnit = null;
 let activeHistoryEntry = null;
 
 function showStorageNotice(message) {
@@ -267,6 +462,7 @@ function loadStats() {
         Number.isSafeInteger(entry.total) && entry.total > 0 && entry.correct <= entry.total
       ).map((entry) => ({
         ...entry,
+        unit: typeof entry.unit === "string" ? entry.unit : "",
         answered: Number.isSafeInteger(entry.answered) && entry.answered >= 0 && entry.answered <= entry.total
           ? entry.answered
           : entry.total,
@@ -327,7 +523,7 @@ function renderHistory() {
     icon.textContent = entry.icon;
     const details = document.createElement("div");
     const subject = document.createElement("strong");
-    subject.textContent = `${entry.grade} · ${entry.subject}`;
+    subject.textContent = `${entry.grade} · ${entry.subject}${entry.unit ? ` · ${entry.unit}` : ""}`;
     const caption = document.createElement("span");
     caption.textContent = entry.answered < entry.total
       ? `${entry.answered} / ${entry.total}問に回答 · 進行中`
@@ -362,6 +558,7 @@ function renderSubjects() {
     return option;
   }));
   subjectSelect.value = subjects.some((subject) => subject.id === previous) ? previous : subjects[0].id;
+  renderUnits();
   subjectGrid.replaceChildren(...subjects.map((subject) => {
     const card = document.createElement("button");
     card.type = "button";
@@ -371,7 +568,7 @@ function renderSubjects() {
 
     const tag = document.createElement("span");
     tag.className = "subject-tag";
-    tag.textContent = "3問";
+    tag.textContent = "単元別";
     const text = document.createElement("span");
     const title = document.createElement("h3");
     title.textContent = subject.name;
@@ -386,10 +583,30 @@ function renderSubjects() {
     card.addEventListener("click", () => {
       subjectSelect.value = subject.id;
       syncSubjectCards();
-      startQuiz();
+      renderUnits();
     });
     return card;
   }));
+}
+
+function renderUnits() {
+  const stage = stageForGrade(gradeSelect.value);
+  const customBank = customQuestionBanks[gradeSelect.value]?.[subjectSelect.value];
+  const gradeQuestionForSubject = gradeQuestions[gradeSelect.value][subjectSelect.value];
+  const availableQuestions = customBank
+    ? Object.values(customBank).flat()
+    : [gradeQuestionForSubject, ...questions[stage][subjectSelect.value]];
+  const units = customBank
+    ? Object.keys(customBank)
+    : [...new Set(availableQuestions.map((question) => question.unit))];
+  const previous = unitSelect.value;
+  unitSelect.replaceChildren(...units.map((unit) => {
+    const option = document.createElement("option");
+    option.value = unit;
+    option.textContent = unit;
+    return option;
+  }));
+  unitSelect.value = units.includes(previous) ? previous : units[0];
 }
 
 function syncSubjectCards() {
@@ -410,11 +627,26 @@ function startQuiz() {
   const subject = subjectsByStage[stage].find((item) => item.id === subjectSelect.value);
   const bank = questions[stage][subject.id];
   activeSubject = subject;
-  const gradeQuestionForSubject = gradeQuestions[gradeSelect.value][subject.id];
-  activeQuestions = [
-    gradeQuestionForSubject,
-    ...bank.slice(1).map((question) => ({ ...question, unit: "基礎のふりかえり" })),
-  ].map((question) => ({ ...question, options: [...question.options] }));
+  activeUnit = unitSelect.value;
+  const customBank = customQuestionBanks[gradeSelect.value]?.[subject.id];
+  if (customBank) {
+    activeQuestions = [...customBank[activeUnit]];
+  } else {
+    const gradeQuestionForSubject = gradeQuestions[gradeSelect.value][subject.id];
+    activeQuestions = [gradeQuestionForSubject, ...bank]
+      .filter((question) => question.unit === activeUnit);
+  }
+  activeQuestions = shuffled(activeQuestions).slice(0, 3).map((question) => {
+    const options = shuffled(question.options.map((option, index) => ({
+      option,
+      correct: index === question.answer,
+    })));
+    return {
+      ...question,
+      options: options.map(({ option }) => option),
+      answer: options.findIndex(({ correct }) => correct),
+    };
+  });
   questionIndex = 0;
   correctAnswers = 0;
   activeHistoryEntry = null;
@@ -470,6 +702,7 @@ function recordAnswer(isCorrect) {
       completedAt: now.toISOString(),
       grade: gradeSelect.value,
       subject: activeSubject.name,
+      unit: activeUnit,
       icon: activeSubject.icon,
       color: activeSubject.color,
       correct: 0,
@@ -557,7 +790,10 @@ gradeSelect.addEventListener("change", () => {
   updateGradeLabels();
   renderSubjects();
 });
-subjectSelect.addEventListener("change", syncSubjectCards);
+subjectSelect.addEventListener("change", () => {
+  syncSubjectCards();
+  renderUnits();
+});
 document.querySelector("#start-button").addEventListener("click", startQuiz);
 document.querySelector(".profile-button").addEventListener("click", () => gradeSelect.focus());
 document.querySelector("#close-quiz").addEventListener("click", () => quizDialog.close());
