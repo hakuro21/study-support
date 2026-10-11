@@ -14,8 +14,10 @@ const subjectsByStage = {
   elementary: [
     { id: "math", name: "算数", description: "計算や図形にチャレンジ", icon: "🔢", color: "math" },
     { id: "japanese", name: "国語", description: "ことばと文章を学ぼう", icon: "📖", color: "japanese" },
+    { id: "life", name: "生活", description: "身近な人や自然を知ろう", icon: "🌱", color: "science" },
     { id: "science", name: "理科", description: "ふしぎを見つけよう", icon: "🔬", color: "science" },
     { id: "social", name: "社会", description: "くらしや地図を知ろう", icon: "🗺️", color: "social" },
+    { id: "english", name: "英語", description: "身近な英語にふれよう", icon: "🔤", color: "english" },
   ],
   middle: [
     { id: "math", name: "数学", description: "考える力をのばそう", icon: "📐", color: "math" },
@@ -31,6 +33,21 @@ const subjectsByStage = {
     { id: "japanese", name: "国語", description: "文章の読解にチャレンジ", icon: "📖", color: "japanese" },
     { id: "science", name: "化学", description: "化学の基本を確認しよう", icon: "🧪", color: "science" },
   ],
+};
+
+const subjectsByGrade = {
+  小1: ["math", "japanese", "life"],
+  小2: ["math", "japanese", "life"],
+  小3: ["math", "japanese", "science", "social"],
+  小4: ["math", "japanese", "science", "social"],
+  小5: ["math", "japanese", "science", "social", "english"],
+  小6: ["math", "japanese", "science", "social", "english"],
+  中1: ["math", "japanese", "english", "science", "social"],
+  中2: ["math", "japanese", "english", "science", "social"],
+  中3: ["math", "japanese", "english", "science", "social"],
+  高1: ["math", "japanese", "english", "physics", "science"],
+  高2: ["math", "japanese", "english", "physics", "science"],
+  高3: ["math", "japanese", "english", "physics", "science"],
 };
 
 const questions = {
@@ -54,6 +71,16 @@ const questions = {
       { prompt: "日本の都道府県の数はいくつ？", options: ["43", "45", "47", "50"], answer: 2, explanation: "日本には1都1道2府43県、合わせて47の都道府県があるよ。" },
       { prompt: "地図で、ふつう上の方が表す方角は？", options: ["東", "西", "南", "北"], answer: 3, explanation: "地図は上が北、下が南を表すことが多いよ。" },
       { prompt: "日本でいちばん高い山はどれ？", options: ["北岳", "富士山", "奥穂高岳", "槍ヶ岳"], answer: 1, explanation: "富士山は標高3,776mで、日本でいちばん高い山だよ。" },
+    ],
+    life: [
+      { prompt: "通学路を歩くとき、安全のために気をつけることは？", options: ["左右をたしかめて歩く", "車道の真ん中を歩く", "信号を見ない", "走って道路をわたる"], answer: 0, explanation: "道路をわたるときは左右をたしかめ、安全を確認しよう。" },
+      { prompt: "植物を育てるとき、土がかわいていたら何をする？", options: ["水をあげる", "土をける", "葉をとる", "箱にしまう"], answer: 0, explanation: "植物が育つように、土の様子を見て水をあげよう。" },
+      { prompt: "学校で使った道具を次の人も使えるようにするには？", options: ["もとの場所に片づける", "床に置く", "持ち帰る", "かくす"], answer: 0, explanation: "道具をもとの場所に片づけると、みんなが使いやすいね。" },
+    ],
+    english: [
+      { prompt: "「りんご」を表す英語はどれ？", options: ["apple", "book", "dog", "blue"], answer: 0, explanation: "appleは「りんご」という意味だよ。" },
+      { prompt: "「こんにちは」とあいさつするときに使う英語は？", options: ["Hello.", "Good night.", "Thank you.", "Goodbye."], answer: 0, explanation: "Helloは、出会ったときのあいさつだよ。" },
+      { prompt: "「私はユキです」を表す英文は？", options: ["I am Yuki.", "I is Yuki.", "You am Yuki.", "I are Yuki."], answer: 0, explanation: "主語がIのときはbe動詞amを使うよ。" },
     ],
   },
   middle: {
@@ -109,6 +136,91 @@ const questions = {
       { prompt: "原子核を構成する粒子の組み合わせは？", options: ["陽子と中性子", "陽子と電子", "電子と中性子", "電子だけ"], answer: 0, explanation: "原子核は、正の電荷をもつ陽子と電荷をもたない中性子からできているよ。" },
       { prompt: "酸と塩基が反応して水と塩ができる反応は？", options: ["酸化", "中和", "分解", "重合"], answer: 1, explanation: "酸と塩基が反応して互いの性質を打ち消し、水と塩を生じる反応を中和というよ。" },
     ],
+  },
+};
+
+const gradeQuestion = (unit, prompt, options, answer, explanation) => ({
+  unit, prompt, options, answer, explanation,
+});
+
+const gradeQuestions = {
+  小1: {
+    math: gradeQuestion("10までのかず", "どんぐりが7こあります。3こもらうと、ぜんぶで何こ？", ["9こ", "10こ", "11こ", "12こ"], 1, "7に3をたすと10だよ。"),
+    japanese: gradeQuestion("ひらがな", "「ねこ」の最初の文字はどれ？", ["ぬ", "ね", "の", "れ"], 1, "「ねこ」は「ね」から始まることばだよ。"),
+    life: gradeQuestion("学校のくらし", "学校で本を借りたり読んだりする場所は？", ["理科室", "図書室", "校庭", "保健室"], 1, "本を読む場所は図書室だね。"),
+  },
+  小2: {
+    math: gradeQuestion("かけ算", "おさらが4まいあり、りんごがそれぞれ3こずつあります。りんごは何こ？", ["7こ", "12こ", "14こ", "43こ"], 1, "3こずつ4つ分なので、3×4=12こだよ。"),
+    japanese: gradeQuestion("主語と述語", "「犬が公園を走る。」の述語はどれ？", ["犬が", "公園を", "走る", "公園"], 2, "「どうする」にあたる「走る」が述語だよ。"),
+    life: gradeQuestion("生きもののようす", "チューリップの花がさく季節は？", ["春", "夏", "秋", "冬"], 0, "チューリップは春に花がさくよ。"),
+  },
+  小3: {
+    math: gradeQuestion("わり算", "24このあめを6人で同じ数ずつ分けると、1人分は？", ["3こ", "4こ", "5こ", "6こ"], 1, "24÷6=4で、1人分は4こだよ。"),
+    japanese: gradeQuestion("段落", "文章を内容のまとまりごとに分けたものを何という？", ["段落", "句点", "主語", "題名"], 0, "文章のまとまりを段落というよ。"),
+    science: gradeQuestion("植物の育ち", "ホウセンカの種が発芽するために必要なものは？", ["水", "砂糖", "日光だけ", "肥料だけ"], 0, "種は発芽するときに水が必要だよ。"),
+    social: gradeQuestion("地図記号", "地図で、寺を表す記号はどれ？", ["卍", "〒", "♨", "◎"], 0, "地図では「卍」が寺を表す記号だよ。"),
+  },
+  小4: {
+    math: gradeQuestion("小数のわり算", "3.6÷4はいくつ？", ["0.09", "0.9", "9", "14.4"], 1, "36÷4=9をもとにすると、3.6÷4=0.9だよ。"),
+    japanese: gradeQuestion("漢字の組み立て", "「休」は「人」と何を組み合わせた漢字？", ["木", "日", "口", "山"], 0, "「休」は人が木のそばで休む様子からできた漢字だよ。"),
+    science: gradeQuestion("電気のはたらき", "乾電池2個を直列につなぐと、1個のときより豆電球はどうなる？", ["明るくなる", "暗くなる", "必ず消える", "変わらない"], 0, "直列につなぐと回路に加わる電圧が大きくなり、明るくなるよ。"),
+    social: gradeQuestion("都道府県", "日本でいちばん北にある都道府県は？", ["青森県", "北海道", "岩手県", "秋田県"], 1, "日本の最北にある都道府県は北海道だよ。"),
+  },
+  小5: {
+    math: gradeQuestion("異分母の分数", "1/2 + 1/3 はいくつ？", ["2/5", "5/6", "1/6", "1"], 1, "分母を6にそろえると3/6+2/6=5/6だよ。"),
+    japanese: gradeQuestion("敬語", "「先生が言う」を敬語で表すと？", ["先生がおっしゃる", "先生が申す", "先生がうかがう", "先生がいただく"], 0, "相手を敬う言い方は「おっしゃる」だよ。"),
+    science: gradeQuestion("植物の発芽と成長", "植物が発芽したあと、よく成長するために必要なものは？", ["水・空気・適した温度", "砂糖・塩", "暗さだけ", "土だけ"], 0, "発芽には水・空気・適した温度が必要だよ。"),
+    social: gradeQuestion("日本の農業", "日本で、あたたかい地域を中心にさかんな米づくりは？", ["稲作", "酪農", "養蚕", "林業"], 0, "米を育てる農業を稲作というよ。"),
+    english: gradeQuestion("身近な英語", "「私はサッカーが好きです」に合う英文は？", ["I like soccer.", "I likes soccer.", "I am soccer.", "I liking soccer."], 0, "主語がIのときは動詞の原形likeを使うよ。"),
+  },
+  小6: {
+    math: gradeQuestion("分数のかけ算", "2/3 × 3/4 はいくつ？", ["1/2", "5/7", "6/7", "1"], 0, "分子どうし、分母どうしをかけると6/12=1/2だよ。"),
+    japanese: gradeQuestion("漢字の成り立ち", "「森林」の「森」は、何という成り立ちの漢字？", ["象形文字", "会意文字", "形声文字", "仮名"], 1, "「木」を三つ組み合わせて意味を表す会意文字だよ。"),
+    science: gradeQuestion("水よう液の性質", "青色リトマス紙を赤色に変える水よう液は？", ["酸性", "中性", "アルカリ性", "純水"], 0, "酸性の水よう液は青色リトマス紙を赤色に変えるよ。"),
+    social: gradeQuestion("日本の歴史", "聖徳太子が定めたとされる、役人の心構えを示したものは？", ["十七条の憲法", "大宝律令", "武家諸法度", "五箇条の御誓文"], 0, "聖徳太子は十七条の憲法を定めたとされているよ。"),
+    english: gradeQuestion("過去のこと", "「私は昨日、図書館へ行きました」に合う英文は？", ["I go to the library yesterday.", "I went to the library yesterday.", "I am going yesterday.", "I goes yesterday."], 1, "yesterdayがあるので、goの過去形wentを使うよ。"),
+  },
+  中1: {
+    math: gradeQuestion("正負の数", "−3 + 8 はいくつ？", ["−11", "−5", "5", "11"], 2, "−3から正の向きに8進むと5だよ。"),
+    japanese: gradeQuestion("文の成分", "「妹が本を読む。」の主語はどれ？", ["妹が", "本を", "読む", "本"], 0, "「だれが」にあたる「妹が」が主語だよ。"),
+    english: gradeQuestion("一般動詞", "空欄に入る語は？ I (　) music every day.", ["likes", "like", "am like", "liking"], 1, "主語がIの現在形では動詞の原形likeを使うよ。"),
+    science: gradeQuestion("植物の分類", "種子をつくらず、胞子でふえる植物は？", ["アブラナ", "ゼニゴケ", "マツ", "エンドウ"], 1, "ゼニゴケは胞子でふえるコケ植物だよ。"),
+    social: gradeQuestion("世界の地域構成", "赤道が通る大陸はどれ？", ["南アメリカ大陸", "ヨーロッパ大陸", "南極大陸", "オーストラリア大陸"], 0, "赤道は南アメリカ大陸を通っているよ。"),
+  },
+  中2: {
+    math: gradeQuestion("連立方程式", "x+y=7、x−y=1 のとき、xはいくつ？", ["3", "4", "6", "7"], 1, "2つの式を足すと2x=8なので、x=4だよ。"),
+    japanese: gradeQuestion("用言の活用", "「走った」のもとの形（終止形）はどれ？", ["走る", "走り", "走れ", "走ろう"], 0, "「走った」のもとの形は「走る」だよ。"),
+    english: gradeQuestion("不定詞", "「私は本を読むために図書館へ行った」に合う表現は？", ["to read a book", "read a book", "reading a book", "reads a book"], 0, "目的「〜するために」は to + 動詞の原形で表せるよ。"),
+    science: gradeQuestion("化学変化", "鉄と硫黄を加熱してできる物質は？", ["硫化鉄", "酸化鉄", "水", "塩化鉄"], 0, "鉄と硫黄が化合して硫化鉄ができるよ。"),
+    social: gradeQuestion("日本の気候", "冬に日本海側で雪が多くなる主な理由は？", ["季節風が日本海で水蒸気を含むため", "赤道に近いため", "海流がないため", "台風が毎日来るため"], 0, "冬の季節風が日本海で水蒸気を含み、山地に雪を降らせるよ。"),
+  },
+  中3: {
+    math: gradeQuestion("平方根", "√49 の値は？", ["−7", "7", "14", "49"], 1, "2乗すると49になる正の数は7だよ。"),
+    japanese: gradeQuestion("慣用句", "「頭を抱える」の意味はどれ？", ["悩む", "喜ぶ", "眠る", "急ぐ"], 0, "「頭を抱える」は、困って悩むことを表すよ。"),
+    english: gradeQuestion("現在完了", "空欄に入る語は？ I have (　) this book for two years.", ["have", "had", "has", "having"], 1, "have + 過去分詞で継続を表し、haveの過去分詞はhadだよ。"),
+    science: gradeQuestion("遺伝", "親の形質が子に伝わることを何という？", ["遺伝", "蒸留", "分解", "発酵"], 0, "親から子へ形質が伝わることを遺伝というよ。"),
+    social: gradeQuestion("公民・基本的人権", "日本国憲法で、すべての人に保障される権利を何という？", ["基本的人権", "参政権だけ", "納税の義務", "裁判員制度"], 0, "日本国憲法は基本的人権を保障しているよ。"),
+  },
+  高1: {
+    math: gradeQuestion("数学I・二次関数", "y=x²−4x+3 の軸は？", ["x=−2", "x=−1", "x=2", "x=4"], 2, "平方完成すると y=(x−2)²−1。軸はx=2だよ。"),
+    japanese: gradeQuestion("現代文・論理展開", "筆者の主張を見つけるとき、まず注目するものは？", ["結論を示す表現", "段落の文字数", "漢字の画数", "句読点の数"], 0, "「つまり」「したがって」など結論を示す表現が手がかりになるよ。"),
+    english: gradeQuestion("英語コミュニケーションI・時制", "空欄に入る語は？ She (　) to school every day.", ["go", "goes", "going", "gone"], 1, "三人称単数の主語Sheには、現在形の動詞にsをつけるよ。"),
+    physics: gradeQuestion("物理基礎・速度", "100mを20秒で進んだときの平均の速さは？", ["2m/s", "5m/s", "20m/s", "2000m/s"], 1, "平均の速さは距離÷時間。100÷20=5m/sだよ。"),
+    science: gradeQuestion("化学基礎・物質量", "水H₂O 1分子に含まれる水素原子は何個？", ["1個", "2個", "3個", "4個"], 1, "化学式H₂Oの下付きの2は水素原子が2個という意味だよ。"),
+  },
+  高2: {
+    math: gradeQuestion("数学II・微分", "f(x)=x²+3x の導関数は？", ["x+3", "2x+3", "2x", "x²+3"], 1, "x²を微分すると2x、3xを微分すると3だよ。"),
+    japanese: gradeQuestion("古典・助動詞", "古文の助動詞「む」が表す意味として代表的なものは？", ["推量・意志", "完了だけ", "打消だけ", "受身だけ"], 0, "「む」は文脈により推量や意志などを表すよ。"),
+    english: gradeQuestion("英語・関係代名詞", "空欄に入る語は？ The book (　) I bought is interesting.", ["who", "which", "where", "when"], 1, "先行詞が物なので、関係代名詞whichを使えるよ。"),
+    physics: gradeQuestion("物理・運動方程式", "質量3kgの物体に2m/s²の加速度を与える力は？", ["1.5N", "5N", "6N", "9N"], 2, "F=maより、3×2=6Nだよ。"),
+    science: gradeQuestion("化学・酸と塩基", "水溶液中で水素イオンを生じる物質は？", ["酸", "塩基", "金属", "中性物質"], 0, "酸は水溶液中で水素イオンを生じる物質だよ。"),
+  },
+  高3: {
+    math: gradeQuestion("数学III・積分", "∫₀¹ 2x dx の値は？", ["0", "1", "2", "4"], 1, "[x²]₀¹=1−0=1だよ。"),
+    japanese: gradeQuestion("現代文・要旨", "文章の要旨をまとめるときに大切なことは？", ["中心となる主張と理由を押さえる", "例だけを並べる", "本文をそのまま全部写す", "題名だけを書く"], 0, "要旨では、中心となる主張とそれを支える理由を整理するよ。"),
+    english: gradeQuestion("英語・仮定法", "空欄に入る語は？ If I (　) rich, I would travel the world.", ["am", "were", "will be", "have been"], 1, "現在の事実に反する仮定では、be動詞にwereを使う形が基本だよ。"),
+    physics: gradeQuestion("物理・エネルギー保存", "摩擦や空気抵抗を無視するとき、力学的エネルギーはどうなる？", ["保存される", "必ず0になる", "常に増える", "熱だけになる"], 0, "保存力だけがはたらくとき、力学的エネルギーは保存されるよ。"),
+    science: gradeQuestion("化学・酸化還元", "電子を失う変化を何という？", ["酸化", "還元", "中和", "電離"], 0, "電子を失う変化を酸化、受け取る変化を還元というよ。"),
   },
 };
 
@@ -241,7 +353,7 @@ function renderHistory() {
 
 function renderSubjects() {
   const stage = stageForGrade(gradeSelect.value);
-  const subjects = subjectsByStage[stage];
+  const subjects = subjectsByStage[stage].filter((subject) => subjectsByGrade[gradeSelect.value].includes(subject.id));
   const previous = subjectSelect.value;
   subjectSelect.replaceChildren(...subjects.map((subject) => {
     const option = document.createElement("option");
@@ -298,7 +410,11 @@ function startQuiz() {
   const subject = subjectsByStage[stage].find((item) => item.id === subjectSelect.value);
   const bank = questions[stage][subject.id];
   activeSubject = subject;
-  activeQuestions = bank.map((question) => ({ ...question, options: [...question.options] }));
+  const gradeQuestionForSubject = gradeQuestions[gradeSelect.value][subject.id];
+  activeQuestions = [
+    gradeQuestionForSubject,
+    ...bank.slice(1).map((question) => ({ ...question, unit: "基礎のふりかえり" })),
+  ].map((question) => ({ ...question, options: [...question.options] }));
   questionIndex = 0;
   correctAnswers = 0;
   activeHistoryEntry = null;
@@ -312,6 +428,7 @@ function renderQuestion() {
   answered = false;
   const question = activeQuestions[questionIndex];
   quizCount.textContent = `QUESTION ${questionIndex + 1} / ${activeQuestions.length}`;
+  document.querySelector("#quiz-unit").textContent = question.unit;
   quizTitle.textContent = question.prompt;
   quizProgressFill.style.width = `${(questionIndex / activeQuestions.length) * 100}%`;
   quizFeedback.textContent = "";
