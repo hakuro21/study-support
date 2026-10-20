@@ -52,6 +52,12 @@ a { color: inherit; text-decoration: none; }
 .tip-icon { color: #f4b848; font-size: 22px; }
 .tip-title { margin: 8px 0 5px; font-size: 12px; font-weight: 800; }
 .sidebar-tip p:last-child { margin: 0; color: #858ba3; font-size: 11px; line-height: 1.75; }
+.menu-help { margin-top: 12px; padding: 13px; border: 1px solid #e5e1ff; border-radius: 13px; background: linear-gradient(135deg, #f6f4ff, #fff9ed); }
+.menu-help-title { margin: 0; color: #393f59; font-size: 12px; font-weight: 800; }
+.menu-help p:nth-child(2) { margin: 5px 0 10px; color: #777d95; font-size: 10px; line-height: 1.6; }
+.menu-help a { min-height: 36px; display: flex; align-items: center; justify-content: center; padding: 0 8px; border-radius: 8px; background: var(--purple); color: #fff; font-size: 10px; font-weight: 800; text-align: center; }
+.menu-help a:hover { background: var(--purple-dark); }
+.menu-help a:focus-visible { outline: 3px solid #9389ef; outline-offset: 2px; }
 .sidebar-bottom { display: flex; align-items: center; gap: 7px; margin: 18px 2px 0; color: #a0a5b8; font-size: 9px; line-height: 1.5; }
 .privacy-icon { color: #7b71de; font-size: 13px; }
 
@@ -185,6 +191,13 @@ a { color: inherit; text-decoration: none; }
 .quiz-option:disabled { cursor: default; }
 .quiz-option.correct { border-color: #80d1ad; background: #effbf5; color: #328761; }
 .quiz-option.incorrect { border-color: #f1a49a; background: #fff3f1; color: #c86459; }
+.quiz-help { margin: 18px 0 2px; padding: 17px; border: 1px solid #e5e1ff; border-left: 5px solid var(--purple); border-radius: 13px; background: linear-gradient(110deg, #f6f4ff, #fff9ed); color: #555c76; }
+.quiz-help-heading { margin: 0; color: #393f59; font-size: 15px; font-weight: 800; line-height: 1.5; }
+.quiz-help-heading span { margin-right: 4px; font-size: 20px; vertical-align: -2px; }
+.quiz-help-description { margin: 7px 0 13px; font-size: 12px; line-height: 1.7; }
+.quiz-help-link { min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 14px; border-radius: 9px; background: var(--purple); color: #fff; font-size: 13px; font-weight: 800; text-decoration: none; box-shadow: 0 4px 10px #7163e82b; transition: .18s ease; }
+.quiz-help-link:hover { background: var(--purple-dark); transform: translateY(-1px); }
+.quiz-help-link:focus-visible { outline: 3px solid #9389ef; outline-offset: 3px; }
 .quiz-feedback { min-height: 28px; padding-top: 10px; color: #7b8096; font-size: 11px; line-height: 1.6; }
 .quiz-feedback.good { color: #388c68; }
 .quiz-feedback.bad { color: #cb685d; }

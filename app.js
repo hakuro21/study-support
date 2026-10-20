@@ -756,6 +756,18 @@ const today = new Date();
 document.querySelector("#today-date").textContent = new Intl.DateTimeFormat("ja-JP", {
   year: "numeric", month: "long", day: "numeric", weekday: "long",
 }).format(today);
+const dailyMessages = [
+  "「できた！」を一つずつ。",
+  "「どうしたら勉強できるかな？」を一緒に考えよう。",
+  "分からないところまで戻って、一つずつ確かめよう。",
+  "小さな「できた！」が、次の自信につながるよ。",
+  "自分に合った勉強の仕方を見つけていこう。",
+  "つまずいたところが、これから伸びるところ。",
+  "あせらず、自分のペースで一歩ずつ進もう。",
+];
+const localMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+const dayNumber = Math.floor(localMidnight.getTime() / 86400000);
+document.querySelector("#daily-message").textContent = dailyMessages[dayNumber % dailyMessages.length];
 
 let stats = loadStats();
 let activeQuestions = [];
