@@ -1,6 +1,7 @@
 const gradeSelect = document.querySelector("#grade-select");
 const subjectSelect = document.querySelector("#subject-select");
-const unitSelect = document.querySelector("#unit-select");
+const unitOptions = document.querySelector("#unit-options");
+const questionCountInput = document.querySelector("#question-count");
 const subjectGrid = document.querySelector("#subject-grid");
 const quizDialog = document.querySelector("#quiz-dialog");
 const quizTitle = document.querySelector("#quiz-title");
@@ -57,6 +58,7 @@ const questions = {
       { unit: "わり算", prompt: "36 ÷ 4 はいくつ？", options: ["8", "9", "10", "12"], answer: 1, explanation: "4 × 9 = 36 だから、36 ÷ 4 = 9 だね。" },
       { unit: "長方形と正方形", prompt: "1辺が5cmの正方形のまわりの長さは？", options: ["10cm", "15cm", "20cm", "25cm"], answer: 2, explanation: "正方形は4辺が同じ長さ。5 × 4 = 20cmだよ。" },
       { unit: "小数のたし算", prompt: "0.7 + 0.8 はいくつ？", options: ["1.3", "1.4", "1.5", "1.6"], answer: 2, explanation: "小数点の位置をそろえて計算すると、0.7 + 0.8 = 1.5。" },
+      { unit: "小数のかけ算", prompt: "1.2 × 3 はいくつ？", options: ["0.36", "3.6", "4.2", "36"], answer: 1, explanation: "12 × 3 = 36をもとにすると、小数点を1けたもどして3.6だよ。" },
     ],
     japanese: [
       { unit: "反対の意味の言葉", prompt: "「美しい」の反対の意味に近い言葉はどれ？", options: ["きれい", "うつくしい", "みにくい", "あざやか"], answer: 2, explanation: "「みにくい」は「美しい」と反対の意味を表す言葉だよ。" },
@@ -590,23 +592,51 @@ function renderSubjects() {
 }
 
 function renderUnits() {
+  const previous = [...unitOptions.querySelectorAll("input:checked")].map((input) => input.value);
+  const units = [...new Set(availableQuestionsForSelection().map((question) => question.unit))];
+  const selectedUnits = previous.filter((unit) => units.includes(unit));
+  const unitsToCheck = selectedUnits.length > 0 ? selectedUnits : units;
+  unitOptions.replaceChildren(...units.map((unit) => {
+    const label = document.createElement("label");
+    label.className = "unit-option";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = unit;
+    checkbox.checked = unitsToCheck.includes(unit);
+    const name = document.createElement("span");
+    name.textContent = unit;
+    label.append(checkbox, name);
+    checkbox.addEventListener("change", updateQuestionCountLimit);
+    return label;
+  }));
+  updateQuestionCountLimit();
+}
+
+function availableQuestionsForSelection() {
   const stage = stageForGrade(gradeSelect.value);
   const customBank = customQuestionBanks[gradeSelect.value]?.[subjectSelect.value];
   const gradeQuestionForSubject = gradeQuestions[gradeSelect.value][subjectSelect.value];
-  const availableQuestions = customBank
+  return customBank
     ? Object.values(customBank).flat()
     : [gradeQuestionForSubject, ...questions[stage][subjectSelect.value]];
-  const units = customBank
-    ? Object.keys(customBank)
-    : [...new Set(availableQuestions.map((question) => question.unit))];
-  const previous = unitSelect.value;
-  unitSelect.replaceChildren(...units.map((unit) => {
-    const option = document.createElement("option");
-    option.value = unit;
-    option.textContent = unit;
-    return option;
-  }));
-  unitSelect.value = units.includes(previous) ? previous : units[0];
+}
+
+function updateQuestionCountLimit() {
+  const selectedUnits = [...unitOptions.querySelectorAll("input:checked")].map((input) => input.value);
+  const availableCount = availableQuestionsForSelection()
+    .filter((question) => selectedUnits.includes(question.unit)).length;
+  const startButton = document.querySelector("#start-button");
+  const limitMessage = document.querySelector("#setup-question-limit");
+  questionCountInput.max = String(Math.max(availableCount, 1));
+  if (!Number.isSafeInteger(questionCountInput.valueAsNumber) || questionCountInput.valueAsNumber < 1) {
+    questionCountInput.value = String(Math.min(5, Math.max(availableCount, 1)));
+  } else if (availableCount > 0 && questionCountInput.valueAsNumber > availableCount) {
+    questionCountInput.value = String(availableCount);
+  }
+  startButton.disabled = availableCount === 0;
+  limitMessage.textContent = availableCount === 0
+    ? "単元を1つ以上選んでください。"
+    : `選んだ単元から${availableCount}問出題できます。`;
 }
 
 function syncSubjectCards() {
@@ -625,18 +655,18 @@ function updateGradeLabels() {
 function startQuiz() {
   const stage = stageForGrade(gradeSelect.value);
   const subject = subjectsByStage[stage].find((item) => item.id === subjectSelect.value);
-  const bank = questions[stage][subject.id];
+  if (!subject) return;
   activeSubject = subject;
-  activeUnit = unitSelect.value;
-  const customBank = customQuestionBanks[gradeSelect.value]?.[subject.id];
-  if (customBank) {
-    activeQuestions = [...customBank[activeUnit]];
-  } else {
-    const gradeQuestionForSubject = gradeQuestions[gradeSelect.value][subject.id];
-    activeQuestions = [gradeQuestionForSubject, ...bank]
-      .filter((question) => question.unit === activeUnit);
+  const selectedUnits = [...unitOptions.querySelectorAll("input:checked")].map((input) => input.value);
+  const availableQuestions = availableQuestionsForSelection()
+    .filter((question) => selectedUnits.includes(question.unit));
+  const requestedCount = questionCountInput.valueAsNumber;
+  if (availableQuestions.length === 0 || !Number.isSafeInteger(requestedCount) ||
+      requestedCount < 1 || requestedCount > availableQuestions.length) {
+    return;
   }
-  activeQuestions = shuffled(activeQuestions).slice(0, 3).map((question) => {
+  activeUnit = selectedUnits.join("・");
+  activeQuestions = shuffled(availableQuestions).slice(0, requestedCount).map((question) => {
     const options = shuffled(question.options.map((option, index) => ({
       option,
       correct: index === question.answer,
@@ -794,6 +824,7 @@ subjectSelect.addEventListener("change", () => {
   syncSubjectCards();
   renderUnits();
 });
+questionCountInput.addEventListener("change", updateQuestionCountLimit);
 document.querySelector("#start-button").addEventListener("click", startQuiz);
 document.querySelector(".profile-button").addEventListener("click", () => gradeSelect.focus());
 document.querySelector("#close-quiz").addEventListener("click", () => quizDialog.close());

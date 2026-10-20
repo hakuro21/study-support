@@ -103,14 +103,22 @@
               <span>教科</span>
               <select id="subject-select" aria-label="教科"></select>
             </label>
-            <label class="select-field">
-              <span>単元</span>
-              <select id="unit-select" aria-label="単元"></select>
+            <fieldset class="select-field unit-field">
+              <legend>単元（複数選択できます）</legend>
+              <div class="unit-options" id="unit-options" aria-label="単元"></div>
+            </fieldset>
+            <label class="select-field question-count-field">
+              <span>問題数</span>
+              <div class="question-count-control">
+                <input id="question-count" type="number" min="1" value="5" step="1" aria-label="問題数">
+                <span>問</span>
+              </div>
             </label>
             <button class="start-button" id="start-button" type="button">
               学習をはじめる <span aria-hidden="true">→</span>
             </button>
           </div>
+          <p class="setup-question-limit" id="setup-question-limit" role="status" aria-live="polite"></p>
         </section>
 
         <section class="stats-grid" aria-label="学習のきろく">
