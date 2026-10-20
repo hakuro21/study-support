@@ -84,8 +84,8 @@
                   <option value="小2">小学2年生</option>
                   <option value="小3">小学3年生</option>
                   <option value="小4">小学4年生</option>
-                  <option value="小5" selected>小学5年生</option>
-                  <option value="小6">小学6年生</option>
+                  <option value="小5">小学5年生</option>
+                  <option value="小6" selected>小学6年生</option>
                 </optgroup>
                 <optgroup label="中学生">
                   <option value="中1">中学1年生</option>
@@ -105,6 +105,9 @@
             </label>
             <fieldset class="select-field unit-field">
               <legend>単元（複数選択できます）</legend>
+              <div class="unit-selection-controls">
+                <button class="unit-select-all" id="unit-select-all" type="button" aria-pressed="false">すべてチェック</button>
+              </div>
               <div class="unit-options" id="unit-options" aria-label="単元"></div>
             </fieldset>
             <label class="select-field question-count-field">
