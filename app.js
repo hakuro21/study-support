@@ -1,5 +1,7 @@
 const gradeSelect = document.querySelector("#grade-select");
 const subjectSelect = document.querySelector("#subject-select");
+const sixthGradeMathLevelField = document.querySelector("#sixth-grade-math-level-field");
+const sixthGradeMathLevelSelect = document.querySelector("#sixth-grade-math-level");
 const unitOptions = document.querySelector("#unit-options");
 const unitSelectAllButton = document.querySelector("#unit-select-all");
 const questionCountInput = document.querySelector("#question-count");
@@ -254,12 +256,83 @@ function formatMathNumber(value) {
   return Number.isInteger(value) ? String(value) : String(Number(value.toFixed(2)));
 }
 
+function numericDistractors(answer, decimalPlacesOverride = null) {
+  const formattedAnswer = decimalPlacesOverride === null
+    ? formatMathNumber(answer)
+    : answer.toFixed(decimalPlacesOverride);
+  const magnitude = 10 ** Math.floor(Math.log10(Math.abs(answer) || 1));
+  const decimalPlaces = formattedAnswer.includes(".") ? formattedAnswer.split(".")[1].length : 0;
+  const answerIsRound = decimalPlaces === 0 && Number.isInteger(answer) && Math.abs(answer) % 10 === 0;
+  const step = answerIsRound
+    ? Math.max(10, Math.round(magnitude / 10))
+    : decimalPlaces > 0
+      ? 10 ** -decimalPlaces
+      : Math.max(1, Math.round(magnitude * 0.01));
+  const formatChoice = (value) => decimalPlaces > 0
+    ? value.toFixed(decimalPlaces)
+    : formatMathNumber(value);
+  const offsets = answerIsRound
+    ? [1, -1, 2, -2, 3, 4, -3, 5, -4, 6, -5, 7, -6].map((multiple) => multiple * step)
+    : decimalPlaces > 0
+      ? [1, -1, 2, -2, 3, 4, -3, 5, -4, 6, -5, 7, -6].map((multiple) => multiple * step)
+      : [
+        step + 1, -(step + 2), step * 2 + 3, -(step * 2 + 4),
+        step * 3 + 7, -(step * 3 + 8), step * 4 + 9, step * 5 + 11,
+      ];
+  const candidates = [];
+  for (const offset of offsets) {
+    const candidate = formatChoice(answer + offset);
+    const integerCandidate = Number(candidate);
+    const preservesRoundingPattern = answerIsRound
+      ? Number.isInteger(integerCandidate) && integerCandidate % 10 === 0
+      : decimalPlaces > 0
+        ? !Number.isInteger(integerCandidate)
+        : Number.isInteger(answer)
+          ? Math.abs(integerCandidate) % 10 !== 0 && Math.abs(integerCandidate) % 5 !== 0
+          : !Number.isInteger(integerCandidate);
+    if (integerCandidate >= 0 && integerCandidate !== Number(formattedAnswer) &&
+        preservesRoundingPattern && !candidates.includes(candidate)) {
+      candidates.push(candidate);
+      if (candidates.length === 3) break;
+    }
+  }
+  for (let offset = 1; candidates.length < 3; offset += 1) {
+    const candidate = formatChoice(answer + offset * step);
+    const integerCandidate = Number(candidate);
+    const preservesRoundingPattern = answerIsRound
+      ? Number.isInteger(integerCandidate) && integerCandidate % 10 === 0
+      : decimalPlaces > 0
+        ? !Number.isInteger(integerCandidate)
+        : Number.isInteger(answer)
+          ? Math.abs(integerCandidate) % 10 !== 0 && Math.abs(integerCandidate) % 5 !== 0
+          : !Number.isInteger(integerCandidate);
+    if (integerCandidate >= 0 && integerCandidate !== Number(formattedAnswer) &&
+        preservesRoundingPattern && !candidates.includes(candidate)) {
+      candidates.push(candidate);
+    }
+  }
+  return candidates;
+}
+
 function simplifyFraction(numerator, denominator) {
   const gcd = (left, right) => right === 0 ? left : gcd(right, left % right);
   const divisor = gcd(numerator, denominator);
   const reducedNumerator = numerator / divisor;
   const reducedDenominator = denominator / divisor;
   return reducedDenominator === 1 ? String(reducedNumerator) : `${reducedNumerator}/${reducedDenominator}`;
+}
+
+function roundedNumericQuestion(unit, prompt, answer, suffix, explanation, add) {
+  if (Number.isInteger(answer)) {
+    return add(unit, prompt, `${formatMathNumber(answer)}${suffix}`,
+      numericDistractors(answer).map((value) => `${value}${suffix}`), explanation);
+  }
+  const roundedAnswer = Math.floor(answer * 10 + 0.5) / 10;
+  const roundedText = roundedAnswer.toFixed(1);
+  const roundingInstruction = "（小数第2位を四捨五入して、小数第1位まで答えましょう）";
+  return add(unit, `${prompt}${roundingInstruction}`, `${roundedText}${suffix}`,
+    numericDistractors(roundedAnswer, 1).map((value) => `${value}${suffix}`),
+    `${explanation} 小数第2位を四捨五入して小数第1位までにすると、${roundedText}${suffix}です。`);
 }
 
 function loadRecentSixthGradeQuestions() {
@@ -287,7 +360,469 @@ function rememberSixthGradeQuestions(questions) {
   }
 }
 
-function makeRandomSixthGradeMathQuestions(recentQuestions = loadRecentSixthGradeQuestions()) {
+function makeSixthGradeApplicationQuestions(recentQuestions = {}) {
+  const question = (unit, prompt, answer, distractors, explanation) =>
+    generatedQuestion(unit, prompt, answer, distractors, explanation);
+  const numeric = (unit, prompt, answer, suffix, explanation) => {
+    return roundedNumericQuestion(unit, prompt, answer, suffix, explanation, question);
+  };
+  const units = {
+    "分数のかけ算・わり算": [
+      () => {
+        const numerator = randomInteger(2, 5);
+        const denominator = randomInteger(numerator + 1, 9);
+        const people = denominator * randomInteger(2, 5);
+        const amount = numerator * people / denominator;
+        return numeric("分数のかけ算・わり算",
+          `1人分に${numerator}/${denominator}L使うスープを${people}人分作ります。必要な量は何Lですか？`,
+          amount, "L", `${numerator}/${denominator}×${people}=${amount}Lです。`);
+      },
+      () => {
+        const total = randomInteger(4, 16);
+        const usedNumerator = randomInteger(1, 3);
+        const usedDenominator = usedNumerator + randomInteger(1, 3);
+        const used = total * usedNumerator / usedDenominator;
+        return numeric("分数のかけ算・わり算",
+          `${total}mのリボンの${usedNumerator}/${usedDenominator}を使いました。残りは何mですか？`,
+          total - used, "m", `使った長さは${total}×${usedNumerator}/${usedDenominator}=${formatMathNumber(used)}m。残りは${total}−${formatMathNumber(used)}=${formatMathNumber(total - used)}mです。`);
+      },
+      () => {
+        const numerator = randomInteger(2, 7);
+        const denominator = randomInteger(numerator + 1, 10);
+        const people = denominator * randomInteger(2, 6);
+        const amount = numerator * people / denominator;
+        const portionNumerator = randomInteger(1, 3);
+        const portionDenominator = portionNumerator + randomInteger(1, 3);
+        const answer = amount * portionNumerator / portionDenominator;
+        return numeric("分数のかけ算・わり算",
+          `${numerator}/${denominator}L入りのびんが${people}本あります。そのうち${portionNumerator}/${portionDenominator}を使うと、何L使いますか？`,
+          answer, "L", `全部で${numerator}/${denominator}×${people}=${amount}Lです。その${portionNumerator}/${portionDenominator}なので${amount}×${portionNumerator}/${portionDenominator}=${formatMathNumber(answer)}Lです。`);
+      },
+      () => {
+        const denominator = randomInteger(3, 9);
+        const numerator = randomInteger(1, denominator - 1);
+        const groups = randomInteger(2, 8);
+        const totalNumerator = numerator * groups;
+        return numeric("分数のかけ算・わり算",
+          `${totalNumerator}/${denominator}kgの小麦粉を、1回に${numerator}/${denominator}kgずつ使います。何回分ありますか？`,
+          groups, "回分", `${totalNumerator}/${denominator}÷${numerator}/${denominator}=${totalNumerator}÷${numerator}=${groups}回分です。`);
+      },
+      () => {
+        const denominator = randomInteger(3, 8);
+        const a = randomInteger(1, denominator - 1);
+        const b = randomInteger(1, denominator - 1);
+        const total = denominator * randomInteger(2, 10);
+        const remaining = total * (denominator - a) / denominator * (denominator - b) / denominator;
+        return numeric("分数のかけ算・わり算",
+          `${total}Lの水の${a}/${denominator}を使い、残りの${b}/${denominator}も使いました。水は何L残っていますか？`,
+          remaining, "L", `1回目の残りは${total}×${denominator - a}/${denominator}L。さらにその${denominator - b}/${denominator}が残るので、${formatMathNumber(remaining)}Lです。`);
+      },
+    ],
+    "割合・百分率": [
+      () => {
+        const original = randomInteger(8, 50) * 100;
+        const firstRate = [10, 20, 25, 30, 40][randomInteger(0, 4)];
+        const secondRate = [10, 20, 25][randomInteger(0, 2)];
+        const price = original * (100 - firstRate) / 100 * (100 - secondRate) / 100;
+        return numeric("割合・百分率",
+          `${original}円の商品を${firstRate}％引きにし、さらに割引後の価格から${secondRate}％引きにします。価格はいくらですか？`,
+          price, "円", `順に割り引きます。${original}×${100 - firstRate}/100×${100 - secondRate}/100=${price}円です。`);
+      },
+      () => {
+        const rate = [60, 70, 75, 80, 85, 90][randomInteger(0, 5)];
+        const original = randomInteger(8, 40) * 100;
+        const sale = original * rate / 100;
+        return numeric("割合・百分率",
+          `ある品物は定価の${rate}％にあたる${sale}円で売られています。定価はいくらですか？`,
+          original, "円", `${sale}円は定価の${rate}％です。${sale}÷${rate / 100}=${original}円です。`);
+      },
+      () => {
+        const people = randomInteger(2, 12) * 100;
+        const rate = [20, 25, 30, 40, 50, 60, 75][randomInteger(0, 6)];
+        const part = people * rate / 100;
+        const denominators = [2, 3, 4, 5, 6].filter((denominator) => part % denominator === 0);
+        const secondDenominator = denominators[randomInteger(0, denominators.length - 1)];
+        const secondNumerator = randomInteger(1, secondDenominator - 1);
+        const answer = part * secondNumerator / secondDenominator;
+        return numeric("割合・百分率",
+          `全校${people}人のうち${rate}％が運動会に参加し、参加者の${secondNumerator}/${secondDenominator}がリレーに出ます。リレーに出るのは何人ですか？`,
+          answer, "人", `参加者は${people}×${rate}/100=${part}人。その${secondNumerator}/${secondDenominator}は${formatMathNumber(answer)}人です。`);
+      },
+      () => {
+        const population = randomInteger(6, 25) * 400;
+        const increase = [5, 10, 15, 20, 25][randomInteger(0, 4)];
+        const decrease = [5, 10, 20, 25][randomInteger(0, 3)];
+        const next = population * (100 + increase) / 100;
+        const answer = next * (100 - decrease) / 100;
+        return numeric("割合・百分率",
+          `人口${population}人の町で、1年目に${increase}％増え、2年目にその人口から${decrease}％減りました。2年後の人口は何人ですか？`,
+          answer, "人", `1年後は${population}×${100 + increase}/100=${next}人。2年後は${next}×${100 - decrease}/100=${answer}人です。`);
+      },
+      () => {
+        const rate = [60, 70, 75, 80, 90][randomInteger(0, 4)];
+        const original = randomInteger(8, 40) * 100;
+        const amount = original * rate / 100;
+        return numeric("割合・百分率",
+          `ある商品を${100 - rate}％引きで買うと${amount}円でした。割引前の価格はいくらですか？`,
+          original, "円", `${amount}円は割引前の${rate}％です。${amount}÷${rate / 100}=${original}円です。`);
+      },
+    ],
+    "比と比例・反比例": [
+      () => {
+        const a = randomInteger(2, 6);
+        const b = randomInteger(2, 7);
+        const scale = randomInteger(5, 30);
+        const total = (a + b) * scale;
+        return numeric("比と比例・反比例",
+          `赤組と白組の人数の比は${a}:${b}で、合わせて${total}人です。赤組は何人ですか？`,
+          a * scale, "人", `比の合計は${a + b}です。1つ分は${total}÷${a + b}=${scale}人なので、赤組は${a}×${scale}=${a * scale}人です。`);
+      },
+      () => {
+        const a = randomInteger(2, 6);
+        const b = randomInteger(2, 7);
+        const scale = randomInteger(5, 25);
+        const transfer = randomInteger(1, Math.min(a, b) * scale - 1);
+        const red = a * scale + transfer;
+        const blue = b * scale - transfer;
+        const divisor = (x, y) => y === 0 ? x : divisor(y, x % y);
+        const gcd = divisor(red, blue);
+        const reducedRed = red / gcd;
+        const reducedBlue = blue / gcd;
+        const answer = `${reducedRed}:${reducedBlue}`;
+        const wrong = [`${reducedRed + 1}:${reducedBlue}`, `${reducedRed}:${reducedBlue + 1}`, `${reducedRed + 2}:${reducedBlue + 1}`];
+        return question("比と比例・反比例",
+          `赤玉と青玉の比は${a}:${b}で、比の1つ分は${scale}個です。青玉から赤玉へ${transfer}個移すと、赤玉と青玉の比はいくつですか？`,
+          answer, wrong, `移す前は赤${a * scale}個、青${b * scale}個です。移した後は${red}個と${blue}個。${gcd}で約分して${answer}です。`);
+      },
+      () => {
+        const a = randomInteger(2, 5);
+        const b = randomInteger(2, 5);
+        const amount = randomInteger(3, 20) * b;
+        const answer = amount * a / b;
+        return numeric("比と比例・反比例",
+          `赤い絵の具と白い絵の具を${a}:${b}で混ぜます。白い絵の具を${amount}mL使うとき、赤い絵の具は何mL必要ですか？`,
+          answer, "mL", `白の${b}つ分が${amount}mLなので、赤は${amount}×${a}/${b}=${answer}mLです。`);
+      },
+      () => {
+        const a = randomInteger(3, 7);
+        const b = randomInteger(2, a - 1);
+        const scale = randomInteger(4, 15);
+        const perimeter = 2 * (a + b) * scale;
+        return numeric("比と比例・反比例",
+          `長方形の縦と横の長さの比は${a}:${b}で、周りの長さは${perimeter}cmです。長い辺は何cmですか？`,
+          a * scale, "cm", `縦横の合計は${perimeter}÷2=${(a + b) * scale}cmです。比の合計${a + b}つ分から1つ分は${scale}cm。長い辺は${a * scale}cmです。`);
+      },
+      () => {
+        const machines = randomInteger(3, 8);
+        const hours = randomInteger(2, 6);
+        const target = randomInteger(2, machines - 1);
+        const answer = machines * hours / target;
+        return numeric("比と比例・反比例",
+          `${machines}台の機械が${hours}時間で同じ量を作ります。同じ性能の機械${target}台では何時間かかりますか？`,
+          answer, "時間", `仕事の量は${machines}×${hours}=${machines * hours}台・時間です。${machines * hours}÷${target}=${formatMathNumber(answer)}時間です。`);
+      },
+    ],
+    "速さ・単位量あたりの大きさ": [
+      () => {
+        const d1 = randomInteger(2, 8) * 300;
+        const d2 = randomInteger(2, 8) * 300;
+        const t1 = randomInteger(5, 20);
+        const t2 = randomInteger(5, 20);
+        const speed = (d1 + d2) / (t1 + t2);
+        return numeric("速さ・単位量あたりの大きさ",
+          `ある人は${d1}mを${t1}分、続けて${d2}mを${t2}分で歩きました。全体の平均の速さは分速何mですか？`,
+          speed, "m/分", `道のりの合計は${d1 + d2}m、時間の合計は${t1 + t2}分です。${d1 + d2}÷${t1 + t2}=${formatMathNumber(speed)}m/分です。`);
+      },
+      () => {
+        const speed = randomInteger(40, 100);
+        const moving = randomInteger(8, 30);
+        const distance = speed * moving;
+        const rest = randomInteger(5, 20);
+        const average = distance / (moving + rest);
+        return numeric("速さ・単位量あたりの大きさ",
+          `${distance}mの道のりを分速${speed}mで進み、途中で${rest}分休みました。出発から到着までの平均の速さは分速何mですか？`,
+          average, "m/分", `進んだ時間は${distance}÷${speed}=${formatMathNumber(moving)}分。休みも含む時間は${formatMathNumber(moving + rest)}分です。${distance}÷${formatMathNumber(moving + rest)}=${formatMathNumber(average)}m/分です。`);
+      },
+      () => {
+        const leadMinutes = randomInteger(5, 20);
+        const slow = randomInteger(50, 90);
+        const faster = slow + randomInteger(20, 60);
+        const catchTime = slow * leadMinutes / (faster - slow);
+        return numeric("速さ・単位量あたりの大きさ",
+          `Aさんが分速${slow}mで出発しました。${leadMinutes}分後にBさんが同じ道を分速${faster}mで追いかけます。Bさんは出発してから何分後に追いつきますか？`,
+          catchTime, "分", `Bさんが出発したときAさんは${slow}×${leadMinutes}=${slow * leadMinutes}m先です。速さの差${faster - slow}m/分で追いつくので、${slow * leadMinutes}÷${faster - slow}=${formatMathNumber(catchTime)}分です。`);
+      },
+      () => {
+        const distance = randomInteger(3, 15) * 11;
+        const speed1 = randomInteger(3, 8);
+        const speed2 = randomInteger(3, 8);
+        const time = distance / (speed1 + speed2);
+        return numeric("速さ・単位量あたりの大きさ",
+          `${distance}km離れた2地点から、時速${speed1}kmと時速${speed2}kmの2人が向かい合って同時に出発します。何時間後に出会いますか？`,
+          time, "時間", `近づく速さは${speed1}+${speed2}=${speed1 + speed2}km/時です。${distance}÷${speed1 + speed2}=${formatMathNumber(time)}時間です。`);
+      },
+      () => {
+        const train = randomInteger(120, 360) * 2;
+        const seconds = randomInteger(8, 24);
+        const speed = train / seconds * 3.6;
+        return numeric("速さ・単位量あたりの大きさ",
+          `長さ${train}mの列車が、止まっている人の前を${seconds}秒で通り過ぎました。列車の速さは時速何kmですか？`,
+          speed, "km/時", `秒速は${train}÷${seconds}=${formatMathNumber(train / seconds)}mです。時速に直すと${formatMathNumber(train / seconds)}×3.6=${formatMathNumber(speed)}km/時です。`);
+      },
+    ],
+    "円の面積・体積": [
+      () => {
+        const length = randomInteger(12, 30);
+        const width = randomInteger(10, 24);
+        const path = randomInteger(1, 3);
+        const area = (length - 2 * path) * (width - 2 * path);
+        return numeric("円の面積・体積",
+          `縦${length}m、横${width}mの長方形の土地の内側に、幅${path}mの通路を周りに作ります。花だんの面積は何m²ですか？`,
+          area, "m²", `通路を除いた縦と横は${length - 2 * path}m、${width - 2 * path}mです。${length - 2 * path}×${width - 2 * path}=${area}m²です。`);
+      },
+      () => {
+        const base = randomInteger(8, 24);
+        const height = randomInteger(5, 18);
+        const triangle = base * height / 2;
+        const rectangle = randomInteger(20, 100);
+        return numeric("円の面積・体積",
+          `長方形の花だんの面積は${rectangle}m²です。そこに底辺${base}m、高さ${height}mの三角形の花だんをつなげました。全体の面積は何m²ですか？`,
+          rectangle + triangle, "m²", `三角形の面積は${base}×${height}÷2=${triangle}m²です。長方形と合わせて${rectangle}+${triangle}=${rectangle + triangle}m²です。`);
+      },
+      () => {
+        const a = randomInteger(2, 8);
+        const b = randomInteger(2, 8);
+        const h = randomInteger(2, 10);
+        const litres = a * b * h * 1000;
+        return numeric("円の面積・体積",
+          `内のりが縦${a}m、横${b}m、深さ${h}mの水そうを満水にします。水は何L入りますか？`,
+          litres, "L", `体積は${a}×${b}×${h}=${a * b * h}m³です。1m³=1000Lなので${litres}Lです。`);
+      },
+      () => {
+        const radius = randomInteger(2, 12);
+        const area = radius * radius * 3.14;
+        return numeric("円の面積・体積",
+          `半径${radius}cmの円の面積を、円周率を3.14として求めます。面積は何cm²ですか？`,
+          area, "cm²", `${radius}×${radius}×3.14=${formatMathNumber(area)}cm²です。`);
+      },
+      () => {
+        const a = randomInteger(8, 20);
+        const b = randomInteger(6, 18);
+        const h = randomInteger(4, 12);
+        const cutA = randomInteger(2, Math.min(5, a - 1));
+        const cutB = randomInteger(2, Math.min(5, b - 1));
+        const cutH = randomInteger(1, Math.min(3, h - 1));
+        const volume = a * b * h - cutA * cutB * cutH;
+        return numeric("円の面積・体積",
+          `縦${a}cm、横${b}cm、高さ${h}cmの直方体から、縦${cutA}cm、横${cutB}cm、高さ${cutH}cmの直方体を切り取りました。残りの体積は何cm³ですか？`,
+          volume, "cm³", `全体は${a}×${b}×${h}=${a * b * h}cm³、切り取った部分は${cutA}×${cutB}×${cutH}=${cutA * cutB * cutH}cm³です。差は${volume}cm³です。`);
+      },
+    ],
+    "拡大図・縮図と対称な図形": [
+      () => {
+        const scale = randomInteger(10000, 80000);
+        const first = randomInteger(2, 12);
+        const second = randomInteger(2, 12);
+        const distance = (first + second) * scale / 100000;
+        return numeric("拡大図・縮図と対称な図形",
+          `縮尺1:${scale}の地図で、家から駅まで${first}cm、駅から学校まで${second}cmです。家から学校までの実際の道のりは何kmですか？`,
+          distance, "km", `地図上の道のりは${first + second}cmです。実際は${(first + second) * scale}cm=${formatMathNumber(distance)}kmです。`);
+      },
+      () => {
+        const scale = randomInteger(10000, 100000);
+        const actualKm = randomInteger(2, 30);
+        const mapCm = actualKm * 100000 / scale;
+        return numeric("拡大図・縮図と対称な図形",
+          `縮尺1:${scale}の地図で、実際に${actualKm}kmある道は何cmで表されますか？`,
+          mapCm, "cm", `${actualKm}kmは${actualKm * 100000}cmです。${actualKm * 100000}÷${scale}=${formatMathNumber(mapCm)}cmです。`);
+      },
+      () => {
+        const scale = randomInteger(1, 6) * 50;
+        const length = randomInteger(3, 16);
+        const width = randomInteger(3, 14);
+        const area = length * scale / 100 * (width * scale / 100);
+        return numeric("拡大図・縮図と対称な図形",
+          `縮尺1:${scale}の設計図で、部屋の縦は${length}cm、横は${width}cmです。実際の床面積は何m²ですか？`,
+          area, "m²", `実際の縦横は${formatMathNumber(length * scale / 100)}m、${formatMathNumber(width * scale / 100)}mです。面積は${formatMathNumber(area)}m²です。`);
+      },
+      () => {
+        const length = randomInteger(2, 12);
+        const width = randomInteger(2, 10);
+        const multiplier = randomInteger(2, 5);
+        const area = length * width * multiplier * multiplier;
+        return numeric("拡大図・縮図と対称な図形",
+          `縦${length}cm、横${width}cmの長方形を、辺の長さがもとの${multiplier}倍になるように拡大します。拡大図の面積は何cm²ですか？`,
+          area, "cm²", `拡大後は縦${length * multiplier}cm、横${width * multiplier}cmです。面積は${length * multiplier}×${width * multiplier}=${area}cm²です。`);
+      },
+      () => {
+        const scale = randomInteger(100, 900);
+        const actual = randomInteger(2, 20) * 5;
+        const drawing = actual * 100 / scale;
+        return numeric("拡大図・縮図と対称な図形",
+          `縮尺1:${scale}の図で、実際の長さが${actual}mの塀は何cmで表されますか？`,
+          drawing, "cm", `${actual}mは${actual * 100}cmです。図の長さは${actual * 100}÷${scale}=${formatMathNumber(drawing)}cmです。`);
+      },
+    ],
+    "データの活用": [
+      () => {
+        const count = randomInteger(5, 12);
+        const average = randomInteger(55, 90);
+        const score = randomInteger(30, 100);
+        const knownTotal = average * count - score;
+        return numeric("データの活用",
+          `${count}人の平均点は${average}点です。${count - 1}人の合計が${knownTotal}点のとき、残り1人は何点ですか？`,
+          score, "点", `全員の合計は${average}×${count}=${average * count}点です。${average * count}−${knownTotal}=${score}点です。`);
+      },
+      () => {
+        const n1 = randomInteger(5, 15);
+        const n2 = randomInteger(5, 15);
+        const a1 = randomInteger(50, 90);
+        const a2 = randomInteger(50, 90);
+        const average = (n1 * a1 + n2 * a2) / (n1 + n2);
+        return numeric("データの活用",
+          `${n1}人の平均点は${a1}点、${n2}人の平均点は${a2}点です。合わせた全員の平均点は何点ですか？`,
+          average, "点", `合計点は${n1}×${a1}+${n2}×${a2}=${n1 * a1 + n2 * a2}点です。人数${n1 + n2}人でわると${formatMathNumber(average)}点です。`);
+      },
+      () => {
+        const values = Array.from({ length: 6 }, () => randomInteger(10, 90)).sort((a, b) => a - b);
+        const median = (values[2] + values[3]) / 2;
+        return numeric("データの活用",
+          `6人の記録は${values.join("、")}点でした。中央値は何点ですか？`,
+          median, "点", `小さい順に並んでいるので、中央の2つ${values[2]}点と${values[3]}点の平均が中央値です。(${values[2]}+${values[3]})÷2=${formatMathNumber(median)}点です。`);
+      },
+      () => {
+        const days = randomInteger(4, 8);
+        const average = randomInteger(20, 80);
+        const values = Array.from({ length: days - 1 }, () => randomInteger(10, 100));
+        const missing = average * days - values.reduce((sum, value) => sum + value, 0);
+        if (missing < 0) return null;
+        return numeric("データの活用",
+          `${days}日間の読書ページ数の平均は1日${average}ページでした。最初の${days - 1}日は${values.join("、")}ページです。最後の日は何ページですか？`,
+          missing, "ページ", `合計は${average}×${days}=${average * days}ページです。最初の${days - 1}日の合計は${values.reduce((sum, value) => sum + value, 0)}ページなので、最後の日は${missing}ページです。`);
+      },
+      () => {
+        const count = randomInteger(4, 10);
+        const average = randomInteger(50, 85);
+        const added = randomInteger(70, 100);
+        const newAverage = (count * average + added) / (count + 1);
+        return numeric("データの活用",
+          `${count}人の平均点は${average}点です。${added}点の人が1人加わると、全員の平均点は何点になりますか？`,
+          newAverage, "点", `もとの合計は${count}×${average}=${count * average}点です。${added}点を加え、${count + 1}人でわると${formatMathNumber(newAverage)}点です。`);
+      },
+    ],
+    "文字と式・数量の関係": [
+      () => {
+        const notebooks = randomInteger(2, 8);
+        const penPrice = randomInteger(80, 240);
+        const pens = randomInteger(2, 6);
+        const notebookPrice = randomInteger(150, 600);
+        const total = notebooks * notebookPrice + pens * penPrice;
+        return numeric("文字と式・数量の関係",
+          `1冊x円のノートを${notebooks}冊と、1本${penPrice}円のペンを${pens}本買うと合計${total}円でした。ノート1冊の値段はいくらですか？`,
+          notebookPrice, "円", `式は${notebooks}x+${penPrice}×${pens}=${total}です。${notebooks}x=${notebooks * notebookPrice}なので、x=${notebookPrice}円です。`);
+      },
+      () => {
+        const tiles = randomInteger(5, 40);
+        const sticks = 3 * tiles + 1;
+        return numeric("文字と式・数量の関係",
+          `正方形のタイルを横一列につなぎ、隣り合う辺を共有します。タイルを${tiles}枚並べると、周りを囲む棒は何本必要ですか？`,
+          sticks, "本", `1枚目は4本で、1枚増えるごとに3本増えます。4+3×(${tiles}−1)=${sticks}本です。`);
+      },
+      () => {
+        const people = randomInteger(2, 8);
+        const ticket = randomInteger(100, 500);
+        const tickets = randomInteger(1, 4);
+        const fee = randomInteger(300, 1200);
+        const total = people * fee + people * tickets * ticket;
+        return numeric("文字と式・数量の関係",
+          `入場料は1人${fee}円、乗り物券は1枚${ticket}円です。${people}人が1人${tickets}枚ずつ買うと合計はいくらですか？`,
+          total, "円", `合計は${people}×${fee}+${people}×${tickets}×${ticket}=${total}円です。`);
+      },
+      () => {
+        const length = randomInteger(4, 20);
+        const width = randomInteger(3, 15);
+        const x = randomInteger(2, 12);
+        const perimeter = 2 * ((length + x) + width);
+        return numeric("文字と式・数量の関係",
+          `縦が${length}cm、横がx cmの長方形があります。x=${x}のとき、周りの長さは何cmですか？`,
+          perimeter, "cm", `周りの長さは2×(${length}+x)です。x=${x}を代入すると2×(${length}+${x})=${perimeter}cmです。`);
+      },
+      () => {
+        const hours = randomInteger(2, 12);
+        const speed = randomInteger(3, 18);
+        const distance = hours * speed;
+        const otherHours = randomInteger(2, 15);
+        return numeric("文字と式・数量の関係",
+          `${hours}時間で${distance}km進む自転車があります。同じ速さでx時間進むとき、x=${otherHours}なら道のりは何kmですか？`,
+          speed * otherHours, "km", `速さは${distance}÷${hours}=${speed}km/時です。道のりは${speed}×${otherHours}=${speed * otherHours}kmです。`);
+      },
+    ],
+    "場合の数・条件整理": [
+      () => {
+        const drinks = randomInteger(2, 8);
+        const sides = randomInteger(2, 8);
+        const desserts = randomInteger(2, 5);
+        const answer = drinks * sides * desserts;
+        return numeric("場合の数・条件整理",
+          `${drinks}種類の飲み物、${sides}種類のおかず、${desserts}種類のデザートから1つずつ選びます。組み合わせは何通りですか？`,
+          answer, "通り", `${drinks}×${sides}×${desserts}=${answer}通りです。`);
+      },
+      () => {
+        const cards = randomInteger(4, 9);
+        const lastDigit = randomInteger(2, Math.min(7, cards - 1));
+        const eligible = cards - lastDigit;
+        const answer = eligible * (cards - 1);
+        return numeric("場合の数・条件整理",
+          `1から${cards}までのカードから異なる2枚で2けたの整数を作ります。一の位が${lastDigit}より大きい整数は何個できますか？`,
+          answer, "個", `一の位は${lastDigit + 1}から${cards}までの${eligible}通りです。十の位は残り${cards - 1}通りなので、${eligible}×${cards - 1}=${answer}個です。`);
+      },
+      () => {
+        const right = randomInteger(2, 5);
+        const up = randomInteger(2, 5);
+        const paths = factorial(right + up) / (factorial(right) * factorial(up));
+        return numeric("場合の数・条件整理",
+          `格子状の道で、目的地まで右に${right}区画、上に${up}区画進みます。最短経路は何通りですか？`,
+          paths, "通り", `全部で${right + up}回進みます。${right}回右へ進む場所の選び方を数えると${paths}通りです。`);
+      },
+      () => {
+        const people = randomInteger(5, 14);
+        const answer = people * (people - 1) / 2;
+        return numeric("場合の数・条件整理",
+          `${people}チームが総当たり戦をし、どの2チームも1回ずつ対戦します。試合は全部で何試合ですか？`,
+          answer, "試合", `各チームが${people - 1}試合ずつ行うと重複して数えるので、${people}×${people - 1}÷2=${answer}試合です。`);
+      },
+      () => {
+        const colors = randomInteger(4, 8);
+        const flags = randomInteger(2, 3);
+        let answer = 1;
+        for (let index = 0; index < flags; index += 1) answer *= colors - index;
+        return numeric("場合の数・条件整理",
+          `${colors}色から${flags}色を選び、左から順に並べて旗を作ります。同じ色を使わないとき、何通りできますか？`,
+          answer, "通り", `${colors}色から順に${flags}色を選ぶので${Array.from({ length: flags }, (_, index) => colors - index).join("×")}=${answer}通りです。`);
+      },
+    ],
+  };
+  const factorial = (value) => value <= 1 ? 1 : value * factorial(value - 1);
+  const banks = {};
+  for (const [unit, templates] of Object.entries(units)) {
+    const previous = new Set(recentQuestions[unit] || []);
+    const prompts = new Set();
+    for (let count = 0; count < 50; count += 1) {
+      let item;
+      for (let attempt = 0; attempt < 5000; attempt += 1) {
+        item = templates[randomInteger(0, templates.length - 1)]();
+        if (item && !previous.has(item.prompt) && !prompts.has(item.prompt)) break;
+        item = null;
+      }
+      if (!item) throw new Error(`応用問題を50問作成できませんでした: ${unit}`);
+      (banks[unit] ||= []).push(item);
+      prompts.add(item.prompt);
+    }
+  }
+  return banks;
+}
+
+function makeRandomSixthGradeMathQuestions(recentQuestions = loadRecentSixthGradeQuestions(), difficulty = "standard") {
   const banks = {
     "分数のかけ算・わり算": [],
     "割合・百分率": [],
@@ -297,16 +832,13 @@ function makeRandomSixthGradeMathQuestions(recentQuestions = loadRecentSixthGrad
     "拡大図・縮図と対称な図形": [],
     "データの活用": [],
     "文字と式・数量の関係": [],
+    "場合の数・条件整理": [],
   };
+  if (difficulty === "application") return makeSixthGradeApplicationQuestions(recentQuestions);
   const add = (unit, prompt, answer, distractors, explanation) =>
     generatedQuestion(unit, prompt, answer, distractors, explanation);
-  const numericOptions = (answer) => {
-    const values = [answer + 1, Math.max(0, answer - 1), answer + 2];
-    return [...new Set(values.map(formatMathNumber))].slice(0, 3);
-  };
   const numericQuestion = (unit, prompt, answer, suffix, explanation) =>
-    add(unit, prompt, `${formatMathNumber(answer)}${suffix}`,
-      numericOptions(answer).map((value) => `${value}${suffix}`), explanation);
+    roundedNumericQuestion(unit, prompt, answer, suffix, explanation, add);
   const fractionQuestion = (unit, prompt, numerator, denominator, explanation) => {
     const answer = simplifyFraction(numerator, denominator);
     const distractors = [
@@ -712,10 +1244,9 @@ function makeRandomSixthGradeMathQuestions(recentQuestions = loadRecentSixthGrad
       () => {
         const time = randomInteger(2, 8);
         const distance = randomInteger(20, 90);
-        return add("文字と式・数量の関係",
+        return numericQuestion("文字と式・数量の関係",
           `一定の速さで${time}時間に${distance}km進みます。時間をx時間とすると道のりを表す式は？`,
-          `${formatMathNumber(distance / time)}x`,
-          [`${formatMathNumber(distance / time + 1)}x`, `${formatMathNumber(distance / time - 1)}x`, `${formatMathNumber(distance / time)}x+1`],
+          distance / time, "x",
           `速さは${distance}÷${time}=${formatMathNumber(distance / time)}km/時です。道のりは速さ×時間なので${formatMathNumber(distance / time)}xです。`);
       },
     ],
@@ -900,6 +1431,7 @@ function renderSubjects() {
     return option;
   }));
   subjectSelect.value = subjects.some((subject) => subject.id === previous) ? previous : subjects[0].id;
+  sixthGradeMathLevelField.hidden = gradeSelect.value !== "小6" || subjectSelect.value !== "math";
   renderUnits();
   subjectGrid.replaceChildren(...subjects.map((subject) => {
     const card = document.createElement("button");
@@ -925,6 +1457,7 @@ function renderSubjects() {
     card.addEventListener("click", () => {
       subjectSelect.value = subject.id;
       syncSubjectCards();
+      sixthGradeMathLevelField.hidden = gradeSelect.value !== "小6" || subjectSelect.value !== "math";
       renderUnits();
     });
     return card;
@@ -964,6 +1497,9 @@ function availableQuestionsForSelection() {
   const stage = stageForGrade(gradeSelect.value);
   const customBank = customQuestionBanks[gradeSelect.value]?.[subjectSelect.value];
   const gradeQuestionForSubject = gradeQuestions[gradeSelect.value][subjectSelect.value];
+  if (gradeSelect.value === "小6" && subjectSelect.value === "math") {
+    return Object.values(customBank || {}).flat();
+  }
   return customBank
     ? Object.values(customBank).flat()
     : [gradeQuestionForSubject, ...questions[stage][subjectSelect.value]];
@@ -1010,8 +1546,13 @@ function startQuiz() {
   const subject = subjectsByStage[stage].find((item) => item.id === subjectSelect.value);
   if (!subject) return;
   activeSubject = subject;
-  if (gradeSelect.value === "小6" && subjectSelect.value === "math") {
-    customQuestionBanks.小6.math = makeRandomSixthGradeMathQuestions();
+  const isSixthGradeMath = gradeSelect.value === "小6" && subjectSelect.value === "math";
+  const isApplicationPractice = isSixthGradeMath && sixthGradeMathLevelSelect.value === "application";
+  if (isSixthGradeMath) {
+    customQuestionBanks.小6.math = makeRandomSixthGradeMathQuestions(
+      loadRecentSixthGradeQuestions(),
+      isApplicationPractice ? "application" : "standard",
+    );
   }
   const selectedUnits = [...unitOptions.querySelectorAll("input:checked")].map((input) => input.value);
   const availableQuestions = availableQuestionsForSelection()
@@ -1021,7 +1562,9 @@ function startQuiz() {
       requestedCount < 1 || requestedCount > availableQuestions.length) {
     return;
   }
-  activeUnit = selectedUnits.join("・");
+  activeUnit = isApplicationPractice
+    ? `応用・適性検査対策：${selectedUnits.join("・")}`
+    : selectedUnits.join("・");
   activeQuestions = shuffled(availableQuestions).slice(0, requestedCount).map((question) => {
     const options = shuffled(question.options.map((option, index) => ({
       option,
@@ -1040,7 +1583,7 @@ function startQuiz() {
   correctAnswers = 0;
   activeHistoryEntry = null;
   quizNext.dataset.result = "false";
-  quizSubject.textContent = `${gradeLongName(gradeSelect.value)} · ${subject.name}`;
+  quizSubject.textContent = `${gradeLongName(gradeSelect.value)} · ${subject.name}${isApplicationPractice ? " · 応用・適性検査対策" : ""}`;
   renderQuestion();
   quizDialog.showModal();
 }
@@ -1181,7 +1724,20 @@ gradeSelect.addEventListener("change", () => {
 });
 subjectSelect.addEventListener("change", () => {
   syncSubjectCards();
+  sixthGradeMathLevelField.hidden = gradeSelect.value !== "小6" || subjectSelect.value !== "math";
   renderUnits();
+});
+sixthGradeMathLevelSelect.addEventListener("change", () => {
+  const unitCheckboxes = [...unitOptions.querySelectorAll("input[type='checkbox']")];
+  const allUnitsSelected = unitCheckboxes.length > 0 && unitCheckboxes.every((checkbox) => checkbox.checked);
+  customQuestionBanks.小6.math = makeRandomSixthGradeMathQuestions(
+    loadRecentSixthGradeQuestions(),
+    sixthGradeMathLevelSelect.value,
+  );
+  renderUnits();
+  if (allUnitsSelected && [...unitOptions.querySelectorAll("input[type='checkbox']")].some((checkbox) => !checkbox.checked)) {
+    toggleAllUnits();
+  }
 });
 questionCountInput.addEventListener("change", updateQuestionCountLimit);
 unitSelectAllButton.addEventListener("click", toggleAllUnits);
