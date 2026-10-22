@@ -767,7 +767,9 @@ const dailyMessages = [
 ];
 const localMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 const dayNumber = Math.floor(localMidnight.getTime() / 86400000);
-document.querySelector("#daily-message").textContent = dailyMessages[dayNumber % dailyMessages.length];
+document.querySelectorAll("[data-daily-message]").forEach((message) => {
+  message.textContent = dailyMessages[dayNumber % dailyMessages.length];
+});
 
 let stats = loadStats();
 let activeQuestions = [];
