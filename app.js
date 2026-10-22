@@ -2,7 +2,9 @@ const gradeSelect = document.querySelector("#grade-select");
 const subjectSelect = document.querySelector("#subject-select");
 const sixthGradeMathLevelField = document.querySelector("#sixth-grade-math-level-field");
 const sixthGradeMathLevelSelect = document.querySelector("#sixth-grade-math-level");
+const yamaguchiPrepNote = document.querySelector("#yamaguchi-prep-note");
 const unitOptions = document.querySelector("#unit-options");
+const unitFieldLegend = document.querySelector("#unit-field-legend");
 const unitSelectAllButton = document.querySelector("#unit-select-all");
 const questionCountInput = document.querySelector("#question-count");
 const subjectGrid = document.querySelector("#subject-grid");
@@ -14,6 +16,7 @@ const quizSubject = document.querySelector("#quiz-subject");
 const quizFeedback = document.querySelector("#quiz-feedback");
 const quizNext = document.querySelector("#quiz-next");
 const quizProgressFill = document.querySelector("#quiz-progress-fill");
+const writtenResponse = document.querySelector("#written-response");
 
 const subjectsByStage = {
   elementary: [
@@ -822,7 +825,240 @@ function makeSixthGradeApplicationQuestions(recentQuestions = {}) {
   return banks;
 }
 
+function makeYamaguchiQuestions() {
+  const unit = "県立中学校・中等教育学校（共通検査）";
+  const table = (title, headers, rows) => ({ title, headers, rows });
+  const chart = (title, values) => ({ title, chart: values });
+  const passage = (title, text) => ({ title, text });
+  const written = (prompt, materials, modelAnswer, criteria) => ({
+    unit,
+    prompt,
+    options: [],
+    answer: null,
+    explanation: "",
+    writtenResponse: true,
+    minCharacters: 60,
+    materials,
+    modelAnswer,
+    criteria,
+  });
+
+  return {
+    [unit]: [
+      written(
+        "実行委員会の話し合いで、来場者が増えたのは広報の効果だという意見と、雨が少なかったからだという意見が出ました。二つの資料から確かに読み取れる変化を数値で説明し、雨の日数が来場者数に影響したと決めつけられるかどうかも、理由を添えて書きましょう。なお、広報の回数や来場者への聞き取り結果は記録されていません。資料にある事実と、原因についての予想を区別してまとめてください。",
+        [
+          chart("地域イベントの来場者数", [{ label: "2024年", value: 360 }, { label: "2025年", value: 480 }]),
+          table("開催月の雨日数", ["年", "雨日数"], [["2024年", "8日"], ["2025年", "3日"]]),
+        ],
+        "来場者数は2024年の360人から2025年の480人へ120人増えた。雨の日数は8日から3日へ減っているので、天候が来場者数に関係した可能性はあるが、この資料だけでは原因とは言い切れない。",
+        ["来場者数の増加を数値で示した", "雨日数の変化を資料から示した", "因果関係を断定せずに説明した"],
+      ),
+      written(
+        "直売所では、家族から「量が多い方を選べばお得」と言われましたが、重さも値段も違うので、そのままでは比べられません。二つの果物を同じ重さにそろえた場合の値段を計算し、どちらを買うのがよいか、計算の道筋とともに説明しましょう。家族に納得してもらえるよう、まず何gあたりで比べるかを決め、両方に同じ単位を使ってください。この売り場では袋を分けずに買うため、実際の値段と重さを使って公平に比べましょう。",
+        [table("直売所の果物", ["商品", "重さ", "値段"], [["夏みかん", "600g", "540円"], ["りんご", "800g", "640円"]])],
+        "りんごを選ぶ。夏みかんは100gあたり90円、りんごは100gあたり80円なので、同じ重さで比べるとりんごの方が安い。",
+        ["100gあたりの値段を両方求めた", "安い商品を選んだ", "数値を使って比較した"],
+      ),
+      written(
+        "地域イベントの日は、混雑を減らすためにバスの便を一つ増やす案が出ています。担当者は、利用者の合計が多い路線ではなく、1便あたりの利用者が多い路線を優先したいそうです。三つの路線の人数と便数を比べ、どこを増便するか、根拠となる計算も含めて提案しましょう。合計人数だけでは便ごとの混み方は分かりません。路線ごとの利用者数を運行本数で割り、比較の単位をそろえてください。",
+        [table("地域イベントの日のバス利用", ["路線", "利用者数", "運行本数"], [["海側", "180人", "6便"], ["山側", "150人", "3便"], ["駅前", "210人", "7便"]])],
+        "山側の便を増やす。利用者は150人で海側の180人より少ないが、運行は3便だけで、1便あたり50人となり、海側の30人や駅前の30人より多いからだ。",
+        ["提案した路線を明確にした", "利用者数と運行本数を使った", "1便あたりの人数など比較の根拠を示した"],
+      ),
+      written(
+        "市立図書館では、限られた予算で子ども向けの場所を一つ整備することになりました。利用者数の平日と休日の違いを年代ごとに比べ、どの利用者に向けて、どのような工夫をするのがよいかを提案しましょう。提案が資料のどの数値に基づくかも書いてください。利用者数の多い年代を挙げるだけでなく、平日と休日の差から、いつどのような場所が必要かを考えてください。限られた予算でできる具体的な工夫として提案しましょう。",
+        [table("市立図書館の利用者", ["年代", "平日の利用者", "休日の利用者"], [["小学生", "45人", "80人"], ["中高生", "55人", "60人"], ["大人", "120人", "110人"]])],
+        "小学生は平日の45人に対して休日は80人で、休日の利用が多い。休日に子ども向けの読書スペースや行事を用意すると、利用しやすくなると考える。",
+        ["平日と休日の数値を比べた", "読み取った特徴に合う工夫を提案した", "資料の数値を根拠にした"],
+      ),
+      written(
+        "町の公園に、ステージと花だんを置いた後、子どもが遊べる芝生をできるだけ広く残したいと考えています。二つの施設は重ならず、広場の長方形の中にすべて収まるものとして、芝生にできる面積を求めましょう。どの面積を先に求め、どう引いたのか、単位も付けて説明してください。通路や施設の重なりは考えず、広場全体から二つの施設の面積だけを取り除くものとして計算します。面積を比べるときは、すべて同じ単位で表してください。",
+        [table("広場の設計", ["場所", "たて", "横"], [["広場全体", "24m", "18m"], ["ステージ", "8m", "5m"], ["花だん", "10m", "7m"]])],
+        "広場全体は24×18=432m²。ステージは8×5=40m²、花だんは10×7=70m²なので、残りは432−40−70=322m²。",
+        ["広場全体の面積を求めた", "ステージと花だんの面積を引いた", "単位をm²で示した"],
+      ),
+      written(
+        "公園の噴水A、B、Cは、それぞれ決まった間隔で水を出し、正午に同時に出始めました。管理員は、次に三つが同時に出る時刻に合わせて点検をしたいそうです。表の間隔をもとに、何分後に再び同時になるかを求め、なぜその時間になるのか、倍数を使った考え方を説明しましょう。三つの噴水すべてが同時になる最も早い時刻を考え、何時になるかも答えてください。二つずつではなく、三つすべての間隔を満たす時刻を探します。",
+        [table("噴水の運転間隔", ["噴水", "水が出る間隔"], [["A", "6分"], ["B", "8分"], ["C", "10分"]])],
+        "6、8、10の最小公倍数は120なので、120分後に3つが同時に水を出す。6と8と10の倍数を調べ、最初に共通する数を見つける。",
+        ["答えを120分後とした", "3つの間隔に共通する倍数を考えた", "最小公倍数を使った理由を説明した"],
+      ),
+      written(
+        "学校祭で、濃縮液と水を表の比で混ぜて飲み物を作ります。実行委員は、できあがりを18Lにするために、それぞれ何Lずつ用意するか知りたいそうです。濃縮液と水を合わせた比の数を手がかりに1つ分の量を求め、両方の必要量を式と単位を付けて説明しましょう。水だけを増やすと濃さが変わってしまいます。完成量と比の両方を確かめながら、必要な量を出してください。最後に二つの量を足して18Lになるか確かめましょう。",
+        [table("飲み物の濃さ", ["濃縮液（部）", "水（部）", "できあがり（部）"], [["2", "3", "5"]])],
+        "濃縮液と水の合計の比は5なので、18÷5=3.6Lが比の1つ分。濃縮液は3.6×2=7.2L、水は3.6×3=10.8L。",
+        ["比の合計が5と分かる", "1つ分の量を求めた", "濃縮液と水の量をそれぞれ示した"],
+      ),
+      written(
+        "理科の時間に、水と食用油を入れた容器へろうの小片を入れたところ、二つの液体の境目にとどまりました。班では「油には浮く」「水には沈む」という反対の予想も出ています。1cm³あたりの重さを比べ、ろうがそれぞれの液体の中でどうなるか、境目にとどまる理由も含めて説明しましょう。「浮く」「沈む」を別々の液体について判断し、ろうの値が二つの液体の値の間にあることを根拠にしてください。",
+        [table("液体とろうの密度", ["もの", "1cm³あたりの重さ"], [["食用油", "0.91g"], ["ろう", "0.95g"], ["水", "1.00g"]])],
+        "ろうは食用油より密度が大きいので油の中では沈み、水より密度が小さいので水の中では浮く。油と水の境目にとどまると考えられる。",
+        ["ろうと油の密度を比較した", "ろうと水の密度を比較した", "浮く・沈むの結論を両方示した"],
+      ),
+      written(
+        "校庭のアサガオで、日光が当たると葉にでんぷんができるかを調べます。日光を当てた葉だけを調べても、でんぷんが日光によってできたのかは比べられません。実験前には、葉にもともとあるでんぷんの影響を少なくするため鉢を暗い場所に置き、実験後に葉をヨウ素液で調べます。日光を当てない葉をどのように準備し、ほかに何を同じにしておけばよいか、変える条件とそろえる条件を分けて説明しましょう。葉の大きさや水やり、実験する時間をそろえる理由も考えてください。",
+        [table("実験で使う葉", ["葉A", "葉B"], [["日光に当てる", "日光を当てない"]])],
+        "実験前に鉢を暗い場所に置いて、葉にもともとあるでんぷんの影響を少なくする。同じ株の同じくらいの大きさの葉を使い、葉Bだけを光が当たらないようにおおう。水や実験時間などは同じにして、日光の有無だけを変え、実験後にヨウ素液で調べる。",
+        ["日光の有無だけを変えるとした", "葉の大きさなど他の条件をそろえるとした", "比較して調べる理由を示した"],
+      ),
+      written(
+        "科学クラブでは、ブランコが1往復する時間はおもりの重さで変わるのかを調べました。ひもは同じ長さにそろえ、表の結果を得ました。測定値から言えることを、重さと時間の両方を挙げて説明してください。また、この回数の実験だけで確かな結論を出せるかどうかも考えましょう。測定のわずかな差が偶然かどうかを判断するには、どのような追加の測定が必要かも提案してください。おもりを変えるときに、振れ幅なども同じにする必要があります。",
+        [table("ブランコの実験結果（長さは同じ）", ["おもり", "1往復の時間"], [["40g", "1.8秒"], ["60g", "1.8秒"], ["80g", "1.9秒"]])],
+        "この実験では、おもりが40gと60gのときは1.8秒、80gのときは1.9秒だった。差が小さく、測定回数も少ないので、重さで時間が変わると結論づけるには追加実験が必要だ。",
+        ["少なくとも2つの測定値を使った", "結果を過度に一般化しなかった", "追加実験など慎重な判断に触れた"],
+      ),
+      written(
+        "地域交流センターでは、電気を大切に使うため、照明・空調・調理室で節電を試しました。担当者は、次の月に一つの工夫を全館へ広げたいと考えています。工夫の前後で電力量が最も大きく減った場所を計算で確かめ、そこを優先する提案を、他の場所との比較を使って書きましょう。減少率ではなく、実際に減った電力量の大きさで選ぶという条件に注意してください。工夫前と工夫後の差をそれぞれ求め、節電の効果を数値で示してください。",
+        [table("地域交流センターの月間電力量", ["場所", "工夫前", "工夫後"], [["照明", "320kWh", "240kWh"], ["空調", "500kWh", "430kWh"], ["調理室", "180kWh", "150kWh"]])],
+        "照明の工夫を優先する。照明は320−240=80kWh減り、空調の70kWh、調理室の30kWhより減少量が大きいからだ。",
+        ["優先する工夫を明確にした", "工夫前後の差を計算した", "他の場所の減少量と比較した"],
+      ),
+      written(
+        "地域の催しの実行委員会では、駐車場の混雑を心配する人と、会場までの移動手段を増やしたい人が話し合っています。アンケートと移動手段の二つの資料を読み、利用しやすくする工夫を一つ提案しましょう。提案だけでなく、両方の資料から数値を挙げ、それらをどう結びつけて考えたかも説明してください。ただし、二つの調査の回答者が同じ人とは限りません。資料から直接分かることと、対策による効果の予想を分けて書きましょう。",
+        [
+          table("来場者アンケート", ["困ったこと", "回答者"], [["駐車場が混んだ", "42人"], ["会場案内が分かりにくい", "28人"], ["休める場所が少ない", "20人"]]),
+          table("来場者の移動手段", ["手段", "人数"], [["自家用車", "90人"], ["バス", "35人"], ["徒歩・自転車", "25人"]]),
+        ],
+        "提案：臨時バスの案内を増やし、乗り場を分かりやすくして試験的に便を増やす。移動手段では自家用車が90人で最も多く、アンケートでは駐車場の混雑が42人で最も多い。ただし二つの調査の回答者が同じとは限らないため、混雑が減ると断定せず、実施後に利用人数や駐車場の状況を確かめる。",
+        ["具体的な工夫を提案した", "二つの資料から数値を引用した", "資料の情報をつないで理由を説明した"],
+      ),
+      written(
+        "地域の加工所では、収穫した果物を使ってジャムを作ります。試作品は、果物と砂糖を表の比で混ぜると、甘さと固さのバランスがよくなりました。今度は果物を2.4kg使う予定です。試作品と同じ味にするには砂糖を何kg用意すればよいか、また加熱前の材料の合計が何kgになるかを、比の1つ分をもとに説明しましょう。単位をそろえた式で、材料ごとの量と合計量が分かるようにしてください。果物の量が変わっても、レシピの比は保たれるものとして考えます。",
+        [table("ジャムの試作レシピ", ["果物", "砂糖"], [["4", "3"]])],
+        "果物4に対して砂糖は3なので、比の1つ分は2.4÷4=0.6kg。砂糖は0.6×3=1.8kgで、材料の合計は2.4+1.8=4.2kg。",
+        ["比の1つ分を求めた", "砂糖の量を求めた", "合計量を式と単位で示した"],
+      ),
+      written(
+        "校外学習では、地図にある学校から資料館まで歩き、その後バスに乗って公園へ向かいます。道に迷わないよう、歩く区間の実際の長さと、歩く時間、全体の移動時間を事前に調べることになりました。縮尺と表の条件を使い、歩く距離をkmで、待ち時間も含めた移動時間を分で説明しましょう。地図上の長さを実際の長さに直すときは、cmとm、kmの単位変換を確かめ、最後にすべての時間を分にそろえてください。",
+        [
+          table("地図と移動の条件", ["項目", "値"], [["地図の縮尺", "1:25,000"], ["学校から資料館までの地図上の長さ", "3.2cm"], ["歩く速さ", "時速4km"], ["資料館から公園までのバス乗車", "8分"], ["バスを待つ時間", "5分"]]),
+        ],
+        "3.2cm×25,000=80,000cm=0.8km歩く。時速4kmで0.8km歩く時間は0.8÷4時間=12分。バスと待ち時間を合わせると12+8+5=25分。",
+        ["縮尺から0.8kmを求めた", "歩く時間を12分と求めた", "バスと待ち時間を加えた"],
+      ),
+      written(
+        "動物園の飼育体験で、参加者全員に昼食を用意します。子どもも大人も一人一つずつ弁当を受け取り、弁当の4分の1はアレルギーに配慮した特別メニューにすることになりました。表の人数から必要な弁当の合計と特別メニューの数を求め、予算60,000円に収まるかも確かめてください。計算の順序を示し、余った予算も説明しましょう。特別メニューも通常の弁当と同じ値段とし、予算の残額まで確かめて準備担当者へ伝えてください。",
+        [table("参加者と弁当の条件", ["項目", "人数・金額"], [["子ども", "64人"], ["大人とスタッフ", "20人"], ["弁当1つの値段", "650円"], ["特別メニューの割合", "全体の1/4"], ["予算", "60,000円"]])],
+        "弁当は64+20=84個必要で、特別メニューは84÷4=21個。代金は84×650=54,600円なので予算内であり、60,000−54,600=5,400円残る。",
+        ["参加人数から84個と求めた", "特別メニューを21個と求めた", "合計金額と残る予算を正しく求めた"],
+      ),
+      written(
+        "農業クラブでは、同じ広さの畑で育てた野菜の収穫量を、雨の多かった年と少なかった年で比べました。発表では「雨が多いと必ず収穫量が増える」と言い切ってよいでしょうか。表から直接読み取れる変化を数値で説明し、ほかの条件が分からない場合にどこまで結論を言えるかを書きましょう。二つの年では雨の日数以外にも気温や日照、世話の仕方が違った可能性があります。観察結果と原因の説明を分けてください。",
+        [table("同じ広さの畑の収穫記録", ["年", "雨の日数", "収穫量"], [["2024年", "12日", "180kg"], ["2025年", "8日", "210kg"]])],
+        "雨の日は12日から8日に減った一方、収穫量は180kgから210kgへ30kg増えた。この2年の記録だけでは雨の日数が収穫量を決めたとは言えず、気温や世話の仕方なども調べる必要がある。",
+        ["二つの数値の変化を示した", "資料の結果を正しく説明した", "雨が原因と断定できない理由を書いた"],
+      ),
+      written(
+        "学習発表会では、来賓を含めて300人が来る予定で、そのうち来賓24人分の席はあらかじめ予約します。会場の席だけでは足りないのではないかと心配する声が出ました。表から会場の席数を計算し、予約席と自由席がそれぞれ何席かを求めてください。来賓以外の参加者が自由席に座れるか、全員分の席が足りるかを、人数と席数を照らし合わせて説明しましょう。来賓は300人の内数なので、予約席の分を二重に数えないようにしてください。",
+        [table("発表会の座席", ["項目", "数"], [["客席の列", "18列"], ["1列の席", "20席"], ["来賓として予約する席", "24席"], ["来場予定", "300人"]])],
+        "客席は18×20=360席。来賓24人は予約席に座るので、自由席は360−24=336席。来賓以外は300−24=276人で、自由席は60席多いため、全員が座れる。",
+        ["全体の席数を計算した", "予約席を差し引いた", "来場予定と比較して結論を出した"],
+      ),
+      written(
+        "図書委員は、本の紹介を載せる学級新聞を作っています。資料Aには本の内容、資料Bには委員が調べた読書時間の記録、資料Cには下書きがあります。下書きの「長い時間読む人ほど、必ず本が好きになる」という文は、資料だけで言い切れるでしょうか。資料の事実と書き手の考えを区別して、読み手に伝わるように文を直しましょう。二つのグループでは人数が異なるため、答えた人数だけでなく、それぞれのグループに占める割合を比べて判断してください。",
+        [
+          passage("資料A：本の紹介", "この物語では、主人公が失敗を重ねながら、友達と協力して地域の発表会を成功させます。作者は、上手にできることだけでなく、工夫してやり直すことの大切さを描いています。"),
+          table("資料B：学級で聞いた読書時間", ["一日の読書時間", "その本をおもしろいと答えた人数"], [["30分以上", "12人中8人"], ["30分未満", "10人中6人"]]),
+          passage("資料C：新聞の下書き", "本を長い時間読む人は、必ず本が好きになる。だから、みんなも毎日長い時間読書をするとよい。"),
+        ],
+        "30分以上の人は8÷12で約67％、30分未満の人は6÷10で60％がおもしろいと答えた。この調査では前者の割合が少し高いが、人数が少なく、読書時間だけが理由とは言い切れない。",
+        ["二つのグループの人数と割合を使った", "必ずとは言えない理由を書いた", "資料から分かる範囲に文を直した"],
+      ),
+      written(
+        "国語の授業で、同じ出来事でも言葉の選び方によって読み手に伝わる印象が変わることを学びました。委員会の記録に「発表者は話した」とだけ書かれていましたが、聞いた人の様子も伝わる文に直したいそうです。資料の説明を参考に、どのような様子を表す言葉を選ぶかを考え、言葉が伝える様子の違いも説明しましょう。発表者が話す速さだけでなく、聞き手の反応とのつながりが読み手に伝わるようにしてください。",
+        [
+          passage("言葉の資料", "「すらすら」は、つかえずに物事を進める様子を表します。「ゆっくり」は、急がず時間をかける様子を表します。「どきどき」は、緊張や期待で心臓が速く打つような気持ちを表します。"),
+          passage("委員会の記録", "発表者は話した。聞いていた人は、うなずきながら最後まで聞いていた。"),
+        ],
+        "発表者は、聞いている人のうなずきを確かめながら、ゆっくり話した。資料の「ゆっくり」を使うと、急いで言い終えるのではなく、相手に伝えようとする様子が分かる。",
+        ["資料の言葉の意味に合う語を選んだ", "出来事の様子が分かる文に直した", "言葉が伝える印象を説明した"],
+      ),
+      written(
+        "理科クラブでは、飲み物を温かく保つ容器を選ぶ実験をしました。三つの容器に同じ温度のお湯を同じ量入れ、同じ部屋に20分置いた記録です。温度の下がり方を比べて最も保温できた容器を選び、実験から言えることと、さらに確かめるとよいことを説明しましょう。容器以外の条件がそろっていることを根拠に今回の結果をまとめ、別の条件でも同じ結果になるかは慎重に考えてください。温度の差を計算し、下がり方の少ない容器を選びます。",
+        [table("20分後の湯の温度", ["容器", "入れた直後", "20分後"], [["ふたなし", "80℃", "52℃"], ["ふた付き", "80℃", "63℃"], ["布で包む", "80℃", "68℃"]])],
+        "布で包んだ容器は80−68=12℃下がり、ふた付きは17℃、ふたなしは28℃下がったので、今回の条件では布で包んだ容器が最も保温できた。別の日や複数回でも同じ結果になるか確かめたい。",
+        ["温度の下がり方を計算した", "資料に基づいて容器を選んだ", "条件や追加実験に触れた"],
+      ),
+      written(
+        "校庭に棒を立て、晴れた日に影の向きと長さを記録しました。班の一人は「太陽が動いたから影も動いた」とまとめましたが、観察したのは影の変化です。記録にある時刻ごとの向きと長さを順に説明し、観察結果とその理由を区別して、より正確なまとめを書きましょう。資料から直接確かめられるのは棒の影の様子です。太陽の位置については、観察結果をもとに考えた説明として書いてください。",
+        [table("棒の影の観察", ["時刻", "影の向き", "影の長さ"], [["午前9時", "西", "長い"], ["正午", "北", "短い"], ["午後3時", "東", "長い"]])],
+        "影は午前9時に西向きで長く、正午には北向きで短く、午後3時には東向きで長くなった。観察から分かるのは影の変化であり、その理由は太陽の見かけの位置が変わったためと考えられる。",
+        ["三つの時刻の影の向きと長さを示した", "観察結果と理由を分けた", "太陽の位置との関係を説明した"],
+      ),
+      written(
+        "学校では水をむだにしないため、手洗いのときに流し続ける時間を短くする取り組みを始めます。今の使用量と一人あたりの節水量が表にあります。毎日同じ人数が登校し、全員が節水を続けるとして、1日と180日間でどれだけ水を節約できるかを計算してください。その量が身近な人にも伝わるよう、全校への呼びかけを数値の根拠とともに書きましょう。途中の計算から、毎日続けることの意味が伝わる文を考えてください。",
+        [table("学校の水使用", ["項目", "量"], [["児童数", "230人"], ["一人が1日に減らせる量", "2L"], ["年間の登校日", "180日"]])],
+        "1日に減らせる水は230×2=460L。180日では460×180=82,800Lを節約できる。小さな節水でも全員が続ければ大きな量になると伝える。",
+        ["一日の節水量を求めた", "180日分を計算した", "数値を使って呼びかけた"],
+      ),
+      written(
+        "運動会の実行委員は、組ごとの順位に応じて得点を決めています。昨年は、1位の人数が多い組が必ずしも優勝しませんでした。そこで、1位と4位以下の点は変えず、2位と3位の点を見直すことになりました。表の人数を使い、2位を8点、3位を4点にした場合にどの組の合計点が上になるかを計算し、得点配分によって順位が変わる理由を説明しましょう。人数だけや1位の回数だけで判断せず、それぞれの順位の人数に点数を掛けてから合計してください。",
+        [table("昨年の順位別人数", ["組", "1位", "2位", "3位", "4位以下"], [["赤組", "4人", "3人", "3人", "2人"], ["青組", "3人", "5人", "2人", "2人"]]), table("見直し後の点数", ["順位", "1位", "2位", "3位", "4位以下"], [["点数", "10点", "8点", "4点", "1点"]])],
+        "赤組は4×10+3×8+3×4+2×1=78点。青組は3×10+5×8+2×4+2×1=80点なので、青組が2点上になる。1位の人数だけでなく、各順位の人数と配点をすべて合わせるため順位が変わる。",
+        ["両組の合計点を正しく計算した", "順位の結論を示した", "人数と配点の関係を説明した"],
+      ),
+      written(
+        "交流センターの展示室に、直方体の大きな模型を置きます。模型の外側には、底面も含めて紙を貼り、辺のつなぎ目や重なり分は考えないことにしました。材料をむだにしないため、表の三つの長さから必要な紙の面積を求め、どの面の面積を何枚分足したのか分かるように説明しましょう。長さ・幅・高さを組み合わせると同じ大きさの面が二枚ずつあります。六面の面積をすべて確認し、最後に必要な紙の単位を付けてください。",
+        [table("直方体模型の大きさ", ["長さ", "幅", "高さ"], [["120cm", "80cm", "50cm"]])],
+        "上下面は120×80×2=19,200cm²、側面は120×50×2=12,000cm²と80×50×2=8,000cm²。合計39,200cm²の紙が必要。",
+        ["三組の向かい合う面を計算した", "面積をすべて合計した", "cm²で答えた"],
+      ),
+      written(
+        "直売所では、同じ種類の柑橘を二つの袋で販売しています。見た目の袋の大きさだけで決めず、値引き後の値段を同じ重さあたりで比べることになりました。表にある重さと値引き率を使って、それぞれの値引き後の値段を求め、100gあたりの値段が安い袋を理由とともに選びましょう。値引き率をそのまま値引き額と取り違えないようにし、重さもgにそろえて計算過程を示してください。割引後の価格と単位あたりの価格の両方を資料に沿って比べます。",
+        [table("柑橘の販売", ["袋", "重さ", "値引き前", "値引き"], [["A", "3kg", "1,350円", "10％引き"], ["B", "2.5kg", "1,200円", "5％引き"]])],
+        "Aは1,350×0.9=1,215円で、100gあたり40.5円。Bは1,200×0.95=1,140円で、100gあたり45.6円。値引き後もAの方が100gあたり安い。",
+        ["両方の値引き後の値段を求めた", "重さをそろえて比較した", "選んだ理由を数値で示した"],
+      ),
+      written(
+        "市の担当者は、災害時に避難所で水が足りるかを確かめています。子どもと大人を合わせた人数分の水を、1人あたりの必要量をもとに準備し、2L入りのペットボトルを箱で保管します。表の条件から必要な水の総量と箱の数を求め、箱はばら売りされないとして、何L余るかも説明しましょう。人数、日数、1箱の容量を順に使い、最後に必要な箱数を切り上げてください。箱数と余る水量の両方を、単位を付けて伝えましょう。",
+        [table("避難所の水の条件", ["項目", "数"], [["子ども", "24人"], ["大人", "6人"], ["一人1日あたり", "3L"], ["準備する日数", "3日"], ["1箱の本数", "6本（1本2L）"]])],
+        "人数は24+6=30人。水は30×3×3=270L必要。1箱は6×2=12Lなので270÷12=22.5箱。切り上げて23箱買うと276Lになり、6L余る。",
+        ["必要人数と日数を使って270Lと求めた", "1箱の容量から23箱とした", "余る水を6Lと求めた"],
+      ),
+      written(
+        "地域の自然観察会では、鳥を見かけた回数が増えたという声がありました。担当者は、数の変化を記録した表と、調査方法を説明した文章を用意しています。二つを読んで、どの変化を資料から読み取れるか、調査方法の違いが結論にどう影響するかを分けて説明しましょう。年ごとに観察する季節や回数が異なるため、見つかった種類数の差だけで環境の変化を断定できるかも考えてください。より確かに比べるため、どの条件をそろえて調査するかも提案します。",
+        [
+          table("観察された鳥の種類数", ["年", "種類数"], [["2022年", "14種類"], ["2024年", "17種類"], ["2026年", "18種類"]]),
+          passage("調査方法について", "2022年は春の一日だけ、2024年は春と秋に各一日、2026年は春から秋まで毎月一日ずつ観察しました。観察場所は同じ遊歩道ですが、調査する日数は年によって異なります。"),
+        ],
+        "種類数は2022年の14から2026年の18へ増えている。ただし2026年は観察日数が多く、見つける機会も増えているため、鳥の種類そのものが増えたと断定するには、同じ日数・時期で調べる必要がある。",
+        ["種類数の変化を数値で示した", "調査日数の違いに気づいた", "結論の限界と必要な調査を説明した"],
+      ),
+      written(
+        "地域の交流施設では、子どもが安全に遊べる広場を整備します。アンケートには希望する設備、図面には設置できる面積、担当者の話には優先条件が書かれています。これらを別々に見ず、条件を満たす案を一つ選び、必要な面積を計算して、なぜその案が利用者に合うのかを説明しましょう。希望者が多くても、面積または予算の条件を満たさない案は選べません。まず条件に合う案を確かめてから比べてください。",
+        [
+          table("利用者アンケート", ["希望する設備", "希望した人数"], [["日よけのある休憩場所", "36人"], ["小さな遊具", "28人"], ["花だん", "16人"]]),
+          table("設置案", ["案", "必要な面積", "工事費"], [["A：休憩場所", "6m×4m", "18万円"], ["B：遊具", "7m×5m", "24万円"], ["C：花だん", "8m×3m", "12万円"]]),
+          passage("担当者の条件", "整備できるのは30m²以下で、予算は20万円までです。まず一つだけ設置し、利用者の希望が多い案を優先することになりました。"),
+        ],
+        "休憩場所の案Aを選ぶ。面積は6×4=24m²、工事費は18万円で、面積と予算の両方の条件を満たす。希望した人数も36人で最も多い。",
+        ["面積と予算の両条件を確認した", "希望人数を比較して案を選んだ", "数値を根拠に説明した"],
+      ),
+      written(
+        "子ども会では、限られた時間で複数の活動を行う計画を立てています。活動の長さ、準備にかかる時間、終わりの時刻を守る条件が表にあります。活動を順番に行う場合に、すべてを実施できるかを計算し、難しい場合は何分足りないか、時間を守るための工夫を一つ提案しましょう。活動時間だけを足して準備時間を忘れないようにし、時計の時刻から使える時間を求めて比べてください。提案する工夫がどの時間を短くするのかも説明してください。",
+        [
+          table("活動と準備時間", ["活動", "活動時間", "準備時間"], [["工作", "25分", "5分"], ["自然観察", "30分", "10分"], ["ふり返り", "15分", "5分"]]),
+          table("使える時間", ["開始", "終了"], [["午後1時", "午後2時30分"]]),
+        ],
+        "必要な時間は25+5+30+10+15+5=90分で、使える時間も午後1時から2時30分までの90分なので、予定どおりならすべて実施できる。移動や片付けが必要なら、その時間を別に確保する工夫が必要。",
+        ["活動と準備時間を合計した", "使える90分と比べた", "移動・片付けなど現実の条件にも触れた"],
+      ),
+      written(
+        "広報係は、町の取り組みを紹介する掲示を作っています。資料には、取り組みを始める前後の数値と、参加者の感想が記録されています。数値の変化だけを見て成功と決めるのではなく、何が改善し、何がまだ分からないかを整理して、次の一年に続ける提案を理由とともに書きましょう。同じ地域・同じ期間の回収記録として比べますが、取り組み以外の原因もあり得ます。感想の中に示された課題にも触れてください。",
+        [
+          table("同じ地域・同じ期間の取り組み記録", ["項目", "開始前", "1年後"], [["ごみの量", "240kg", "180kg"], ["参加した世帯", "40世帯", "65世帯"]]),
+          passage("参加者の感想", "ごみを分別する方法が分かりやすくなったという声がある一方、参加できなかった世帯からは、回収場所が遠いという意見も寄せられました。"),
+        ],
+        "同じ地域・期間で比べると、ごみの量は240kgから180kgへ60kg減り、参加世帯は40から65へ増えた。取り組みが広がったことは分かるが、ごみが減った原因をこれだけで断定はできない。回収場所が遠いという意見を受け、場所を増やすなど参加しやすい方法を試して次の年も続けたい。",
+        ["前後の数値を正しく比べた", "感想の資料も使った", "課題を踏まえた提案をした"],
+      ),
+    ],
+  };
+}
+
 function makeRandomSixthGradeMathQuestions(recentQuestions = loadRecentSixthGradeQuestions(), difficulty = "standard") {
+  if (difficulty === "entrance") return makeYamaguchiQuestions();
   const banks = {
     "分数のかけ算・わり算": [],
     "割合・百分率": [],
@@ -1432,6 +1668,7 @@ function renderSubjects() {
   }));
   subjectSelect.value = subjects.some((subject) => subject.id === previous) ? previous : subjects[0].id;
   sixthGradeMathLevelField.hidden = gradeSelect.value !== "小6" || subjectSelect.value !== "math";
+  yamaguchiPrepNote.hidden = sixthGradeMathLevelField.hidden || sixthGradeMathLevelSelect.value !== "entrance";
   renderUnits();
   subjectGrid.replaceChildren(...subjects.map((subject) => {
     const card = document.createElement("button");
@@ -1458,6 +1695,7 @@ function renderSubjects() {
       subjectSelect.value = subject.id;
       syncSubjectCards();
       sixthGradeMathLevelField.hidden = gradeSelect.value !== "小6" || subjectSelect.value !== "math";
+      yamaguchiPrepNote.hidden = sixthGradeMathLevelField.hidden || sixthGradeMathLevelSelect.value !== "entrance";
       renderUnits();
     });
     return card;
@@ -1465,10 +1703,18 @@ function renderSubjects() {
 }
 
 function renderUnits() {
-  const previous = [...unitOptions.querySelectorAll("input:checked")].map((input) => input.value);
+  const previous = [...unitOptions.querySelectorAll("input:checked")]
+    .filter((input) => input.dataset.region !== "true")
+    .map((input) => input.value);
   const units = [...new Set(availableQuestionsForSelection().map((question) => question.unit))];
   const selectedUnits = previous.filter((unit) => units.includes(unit));
-  unitOptions.replaceChildren(...units.map((unit) => {
+  const isEntrancePractice = gradeSelect.value === "小6" && subjectSelect.value === "math" &&
+    sixthGradeMathLevelSelect.value === "entrance";
+  unitFieldLegend.textContent = isEntrancePractice
+    ? "県・学校（複数選択できます）"
+    : "単元（複数選択できます）";
+  unitOptions.setAttribute("aria-label", isEntrancePractice ? "受験先" : "単元");
+  const unitLabels = units.map((unit) => {
     const label = document.createElement("label");
     label.className = "unit-option";
     const checkbox = document.createElement("input");
@@ -1479,8 +1725,32 @@ function renderUnits() {
     name.textContent = unit;
     label.append(checkbox, name);
     checkbox.addEventListener("change", updateQuestionCountLimit);
-    return label;
-  }));
+    return { unit, label };
+  });
+  if (isEntrancePractice) {
+    const regionGroup = document.createElement("div");
+    regionGroup.className = "unit-region-group";
+    const regionLabel = document.createElement("label");
+    regionLabel.className = "unit-option unit-region-option";
+    const regionCheckbox = document.createElement("input");
+    regionCheckbox.type = "checkbox";
+    regionCheckbox.dataset.region = "true";
+    regionCheckbox.setAttribute("aria-label", "山口県の受験先をすべて選択");
+    regionCheckbox.addEventListener("change", () => {
+      regionGroup.querySelectorAll(".unit-option input:not([data-region])").forEach((checkbox) => {
+        checkbox.checked = regionCheckbox.checked;
+      });
+      updateQuestionCountLimit();
+    });
+    const regionName = document.createElement("span");
+    regionName.className = "unit-region-name";
+    regionName.textContent = "山口県";
+    regionLabel.append(regionCheckbox, regionName);
+    regionGroup.append(regionLabel, ...unitLabels.map(({ label }) => label));
+    unitOptions.replaceChildren(regionGroup);
+  } else {
+    unitOptions.replaceChildren(...unitLabels.map(({ label }) => label));
+  }
   updateQuestionCountLimit();
 }
 
@@ -1506,14 +1776,26 @@ function availableQuestionsForSelection() {
 }
 
 function updateQuestionCountLimit() {
-  const selectedUnits = [...unitOptions.querySelectorAll("input:checked")].map((input) => input.value);
+  const checkboxes = [...unitOptions.querySelectorAll("input[type='checkbox']")];
+  const regionCheckbox = checkboxes.find((checkbox) => checkbox.dataset.region === "true");
+  const schoolCheckboxes = checkboxes.filter((checkbox) => checkbox.dataset.region !== "true");
+  if (regionCheckbox && schoolCheckboxes.length > 0) {
+    const selectedSchools = schoolCheckboxes.filter((checkbox) => checkbox.checked).length;
+    regionCheckbox.checked = selectedSchools === schoolCheckboxes.length;
+    regionCheckbox.indeterminate = selectedSchools > 0 && selectedSchools < schoolCheckboxes.length;
+  }
+  const selectedUnits = schoolCheckboxes.filter((input) => input.checked).map((input) => input.value);
   const availableCount = availableQuestionsForSelection()
     .filter((question) => selectedUnits.includes(question.unit)).length;
   const startButton = document.querySelector("#start-button");
   const limitMessage = document.querySelector("#setup-question-limit");
-  const unitCheckboxes = [...unitOptions.querySelectorAll("input[type='checkbox']")];
+  const unitCheckboxes = checkboxes;
   const allUnitsSelected = unitCheckboxes.length > 0 && unitCheckboxes.every((checkbox) => checkbox.checked);
-  unitSelectAllButton.textContent = allUnitsSelected ? "すべて解除" : "すべてチェック";
+  const isEntrancePractice = gradeSelect.value === "小6" && subjectSelect.value === "math" &&
+    sixthGradeMathLevelSelect.value === "entrance";
+  unitSelectAllButton.textContent = allUnitsSelected
+    ? "すべて解除"
+    : isEntrancePractice ? "受験先を選択" : "すべてチェック";
   unitSelectAllButton.setAttribute("aria-pressed", String(allUnitsSelected));
   unitSelectAllButton.disabled = unitCheckboxes.length === 0;
   questionCountInput.max = String(Math.max(availableCount, 1));
@@ -1548,13 +1830,16 @@ function startQuiz() {
   activeSubject = subject;
   const isSixthGradeMath = gradeSelect.value === "小6" && subjectSelect.value === "math";
   const isApplicationPractice = isSixthGradeMath && sixthGradeMathLevelSelect.value === "application";
+  const isEntrancePractice = isSixthGradeMath && sixthGradeMathLevelSelect.value === "entrance";
   if (isSixthGradeMath) {
     customQuestionBanks.小6.math = makeRandomSixthGradeMathQuestions(
       loadRecentSixthGradeQuestions(),
-      isApplicationPractice ? "application" : "standard",
+      isEntrancePractice ? "entrance" : isApplicationPractice ? "application" : "standard",
     );
   }
-  const selectedUnits = [...unitOptions.querySelectorAll("input:checked")].map((input) => input.value);
+  const selectedUnits = [...unitOptions.querySelectorAll("input:checked")]
+    .filter((input) => input.dataset.region !== "true")
+    .map((input) => input.value);
   const availableQuestions = availableQuestionsForSelection()
     .filter((question) => selectedUnits.includes(question.unit));
   const requestedCount = questionCountInput.valueAsNumber;
@@ -1562,10 +1847,13 @@ function startQuiz() {
       requestedCount < 1 || requestedCount > availableQuestions.length) {
     return;
   }
-  activeUnit = isApplicationPractice
+  activeUnit = isEntrancePractice
+    ? `受験対策：山口県：${selectedUnits.join("・")}`
+    : isApplicationPractice
     ? `応用・適性検査対策：${selectedUnits.join("・")}`
     : selectedUnits.join("・");
   activeQuestions = shuffled(availableQuestions).slice(0, requestedCount).map((question) => {
+    if (question.writtenResponse) return { ...question };
     const options = shuffled(question.options.map((option, index) => ({
       option,
       correct: index === question.answer,
@@ -1576,14 +1864,14 @@ function startQuiz() {
       answer: options.findIndex(({ correct }) => correct),
     };
   });
-  if (gradeSelect.value === "小6" && subjectSelect.value === "math") {
+  if (isSixthGradeMath && !isEntrancePractice) {
     rememberSixthGradeQuestions(activeQuestions);
   }
   questionIndex = 0;
   correctAnswers = 0;
   activeHistoryEntry = null;
   quizNext.dataset.result = "false";
-  quizSubject.textContent = `${gradeLongName(gradeSelect.value)} · ${subject.name}${isApplicationPractice ? " · 応用・適性検査対策" : ""}`;
+  quizSubject.textContent = `${gradeLongName(gradeSelect.value)} · ${subject.name}${isEntrancePractice ? " · 受験対策" : isApplicationPractice ? " · 応用・適性検査対策" : ""}`;
   renderQuestion();
   quizDialog.showModal();
 }
@@ -1598,7 +1886,15 @@ function renderQuestion() {
   quizFeedback.textContent = "";
   quizFeedback.className = "quiz-feedback";
   quizNext.disabled = true;
-  quizNext.textContent = "こたえをえらんでね";
+  quizNext.textContent = question.writtenResponse ? "記述してね" : "こたえをえらんでね";
+  quizOptions.hidden = Boolean(question.writtenResponse);
+  writtenResponse.hidden = !question.writtenResponse;
+  writtenResponse.replaceChildren();
+  if (question.writtenResponse) {
+    renderWrittenResponse(question);
+    quizOptions.replaceChildren();
+    return;
+  }
   quizOptions.replaceChildren(...question.options.map((option, index) => {
     const button = document.createElement("button");
     button.type = "button";
@@ -1607,6 +1903,163 @@ function renderQuestion() {
     button.addEventListener("click", () => chooseAnswer(index));
     return button;
   }));
+}
+
+function renderWrittenResponse(question) {
+  const instructions = document.createElement("p");
+  instructions.className = "written-instructions";
+  instructions.textContent = `資料の数値や条件を根拠に、結論と理由を自分の言葉で${question.minCharacters}字以上書きましょう。資料の数値は練習用に作成した架空のものです。入力した内容は自動採点せず、模範例と観点で自己チェックします。`;
+
+  const materialElements = question.materials.map((material) => {
+    const section = document.createElement("section");
+    section.className = "written-material";
+    const heading = document.createElement("h3");
+    heading.textContent = material.title;
+    if (material.text) {
+      const content = document.createElement("p");
+      content.className = "written-passage";
+      content.textContent = material.text;
+      section.append(heading, content);
+      return section;
+    }
+    if (material.chart) {
+      const chart = document.createElement("div");
+      chart.className = "written-bar-chart";
+      chart.setAttribute("role", "img");
+      chart.setAttribute("aria-label", `${material.title}の棒グラフ`);
+      const maximum = Math.max(...material.chart.map((item) => item.value));
+      material.chart.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "written-bar-row";
+        const label = document.createElement("span");
+        label.textContent = item.label;
+        const track = document.createElement("div");
+        track.className = "written-bar-track";
+        const bar = document.createElement("div");
+        bar.className = "written-bar";
+        bar.style.width = `${item.value / maximum * 100}%`;
+        track.append(bar);
+        const value = document.createElement("strong");
+        value.textContent = `${item.value}人`;
+        row.append(label, track, value);
+        chart.append(row);
+      });
+      section.append(heading, chart);
+      return section;
+    }
+    const wrapper = document.createElement("div");
+    wrapper.className = "written-table-wrapper";
+    const table = document.createElement("table");
+    const head = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    material.headers.forEach((headingText) => {
+      const cell = document.createElement("th");
+      cell.scope = "col";
+      cell.textContent = headingText;
+      headerRow.append(cell);
+    });
+    head.append(headerRow);
+    const body = document.createElement("tbody");
+    material.rows.forEach((row) => {
+      const rowElement = document.createElement("tr");
+      row.forEach((cellText, index) => {
+        const cell = document.createElement(index === 0 ? "th" : "td");
+        if (index === 0) cell.scope = "row";
+        cell.textContent = cellText;
+        rowElement.append(cell);
+      });
+      body.append(rowElement);
+    });
+    table.append(head, body);
+    wrapper.append(table);
+    section.append(heading, wrapper);
+    return section;
+  });
+
+  const label = document.createElement("label");
+  label.className = "written-answer-label";
+  label.textContent = "あなたの答え";
+  const textarea = document.createElement("textarea");
+  textarea.className = "written-answer";
+  textarea.maxLength = 1000;
+  textarea.rows = 5;
+  textarea.setAttribute("aria-label", "記述式の答え");
+  const submit = document.createElement("button");
+  submit.type = "button";
+  submit.className = "written-submit";
+  submit.textContent = "記述を確認する";
+  const status = document.createElement("p");
+  status.className = "written-status";
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+  label.append(textarea);
+  writtenResponse.append(instructions, ...materialElements, label, submit, status);
+
+  submit.addEventListener("click", () => {
+    textarea.disabled = true;
+    submit.disabled = true;
+    status.textContent = "模範例とチェック項目を見て、自分の答えを確認しましょう。";
+
+    const sample = document.createElement("section");
+    sample.className = "written-sample";
+    const sampleHeading = document.createElement("h3");
+    sampleHeading.textContent = "模範例";
+    const sampleText = document.createElement("p");
+    sampleText.textContent = question.modelAnswer;
+    sample.append(sampleHeading, sampleText);
+
+    const checklistHeading = document.createElement("h3");
+    checklistHeading.className = "written-checklist-heading";
+    checklistHeading.textContent = "自分の答えを観点別にチェック";
+    const checklistHelp = document.createElement("p");
+    checklistHelp.className = "written-checklist-help";
+    checklistHelp.textContent = "模範例と比べ、書けている項目にチェックしてください。";
+    const checklist = document.createElement("div");
+    checklist.className = "written-checklist";
+    question.criteria.forEach((criterion) => {
+      const criterionLabel = document.createElement("label");
+      criterionLabel.className = "written-check-item";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = criterion;
+      const text = document.createElement("span");
+      text.textContent = criterion;
+      criterionLabel.append(checkbox, text);
+      checklist.append(criterionLabel);
+    });
+    const finish = document.createElement("button");
+    finish.type = "button";
+    finish.className = "written-submit";
+    finish.textContent = "自己チェックを確定する";
+    const checkStatus = document.createElement("p");
+    checkStatus.className = "written-status";
+    checkStatus.setAttribute("role", "status");
+    checkStatus.setAttribute("aria-live", "polite");
+    writtenResponse.append(sample, checklistHeading, checklistHelp, checklist, finish, checkStatus);
+    finish.addEventListener("click", () => {
+      const checks = [...checklist.querySelectorAll("input[type='checkbox']")];
+      if (checks.some((checkbox) => !checkbox.checked)) {
+        checkStatus.textContent = "まだチェックされていない観点があります。書けなかったところも、振り返りとして確認しましょう。";
+      }
+      finish.disabled = true;
+      checks.forEach((checkbox) => { checkbox.disabled = true; });
+      completeWrittenAnswer(checks.every((checkbox) => checkbox.checked));
+    });
+    sample.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  });
+}
+
+function completeWrittenAnswer(isSelfChecked) {
+  if (answered) return;
+  answered = true;
+  if (isSelfChecked) correctAnswers += 1;
+  recordAnswer(isSelfChecked);
+  quizFeedback.textContent = isSelfChecked
+    ? "自己チェック完了。模範例の観点を自分の答えで確認できました。"
+    : "振り返り完了。チェックできなかった観点を、模範例を参考に書き直してみましょう。";
+  quizFeedback.classList.add(isSelfChecked ? "good" : "bad");
+  quizNext.disabled = false;
+  quizNext.textContent = questionIndex === activeQuestions.length - 1 ? "結果をみる" : "次の問題へ";
 }
 
 function chooseAnswer(selectedIndex) {
@@ -1670,6 +2123,9 @@ function showResult() {
   quizProgressFill.style.width = "100%";
   quizCount.textContent = "TODAY'S RESULT";
   quizOptions.replaceChildren();
+  quizOptions.hidden = false;
+  writtenResponse.replaceChildren();
+  writtenResponse.hidden = true;
   quizFeedback.textContent = "";
   quizFeedback.className = "quiz-feedback";
   quizTitle.innerHTML = "";
@@ -1681,7 +2137,9 @@ function showResult() {
   const title = document.createElement("h2");
   title.textContent = `${activeQuestions.length}問中 ${correctAnswers}問正解！`;
   const message = document.createElement("p");
-  message.textContent = percent === 100 ? "すばらしい！ぜんぶ正解だよ。" : percent >= 60 ? "いい調子！この調子で続けよう。" : "チャレンジしたことがえらい！解説をふりかえってみよう。";
+  message.textContent = activeQuestions.some((question) => question.writtenResponse)
+    ? "記述問題の正解数は、模範例と観点に基づく自己チェックです。自分の言葉で説明する練習を続けましょう。"
+    : percent === 100 ? "すばらしい！ぜんぶ正解だよ。" : percent >= 60 ? "いい調子！この調子で続けよう。" : "チャレンジしたことがえらい！解説をふりかえってみよう。";
   result.append(emoji, title, message);
   quizTitle.append(result);
 
@@ -1730,12 +2188,19 @@ subjectSelect.addEventListener("change", () => {
 sixthGradeMathLevelSelect.addEventListener("change", () => {
   const unitCheckboxes = [...unitOptions.querySelectorAll("input[type='checkbox']")];
   const allUnitsSelected = unitCheckboxes.length > 0 && unitCheckboxes.every((checkbox) => checkbox.checked);
+  yamaguchiPrepNote.hidden = sixthGradeMathLevelSelect.value !== "entrance";
   customQuestionBanks.小6.math = makeRandomSixthGradeMathQuestions(
     loadRecentSixthGradeQuestions(),
     sixthGradeMathLevelSelect.value,
   );
   renderUnits();
-  if (allUnitsSelected && [...unitOptions.querySelectorAll("input[type='checkbox']")].some((checkbox) => !checkbox.checked)) {
+  const updatedUnitCheckboxes = [...unitOptions.querySelectorAll("input[type='checkbox']")];
+  if (sixthGradeMathLevelSelect.value === "entrance" && updatedUnitCheckboxes.length > 0 &&
+      updatedUnitCheckboxes.every((checkbox) => !checkbox.checked)) {
+    toggleAllUnits();
+  }
+  if (sixthGradeMathLevelSelect.value !== "entrance" && allUnitsSelected &&
+      [...unitOptions.querySelectorAll("input[type='checkbox']")].some((checkbox) => !checkbox.checked)) {
     toggleAllUnits();
   }
 });

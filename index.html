@@ -130,10 +130,15 @@
               <select id="sixth-grade-math-level" aria-label="小学6年算数の問題のレベル">
                 <option value="standard">標準問題</option>
                 <option value="application">応用・適性検査対策</option>
+                <option value="entrance">受験対策</option>
               </select>
+              <p class="yamaguchi-prep-note" id="yamaguchi-prep-note" hidden>
+                表やグラフなどの資料を読み、理由や提案を記述するオリジナル問題です。
+                <a href="https://www.pref.yamaguchi.lg.jp/soshiki/180/26468.html" target="_blank" rel="noopener noreferrer">山口県の公開検査問題</a>を参考にしています。
+              </p>
             </label>
             <fieldset class="select-field unit-field">
-              <legend>単元（複数選択できます）</legend>
+              <legend id="unit-field-legend">単元（複数選択できます）</legend>
               <div class="unit-selection-controls">
                 <button class="unit-select-all" id="unit-select-all" type="button" aria-pressed="false">すべてチェック</button>
               </div>
@@ -236,6 +241,7 @@
         <p class="quiz-count" id="quiz-count"></p>
         <p class="quiz-unit" id="quiz-unit"></p>
         <h2 class="quiz-question" id="quiz-title"></h2>
+        <div class="written-response" id="written-response" hidden></div>
         <div class="quiz-options" id="quiz-options"></div>
         <div class="quiz-feedback" id="quiz-feedback" role="status" aria-live="polite"></div>
         <button class="quiz-next-button" id="quiz-next" type="button" disabled>こたえをえらんでね</button>
