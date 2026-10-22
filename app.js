@@ -2,6 +2,7 @@ const gradeSelect = document.querySelector("#grade-select");
 const subjectSelect = document.querySelector("#subject-select");
 const sixthGradeMathLevelField = document.querySelector("#sixth-grade-math-level-field");
 const sixthGradeMathLevelSelect = document.querySelector("#sixth-grade-math-level");
+let renderedSixthGradeMathLevel = sixthGradeMathLevelSelect.value;
 const yamaguchiPrepNote = document.querySelector("#yamaguchi-prep-note");
 const unitOptions = document.querySelector("#unit-options");
 const unitFieldLegend = document.querySelector("#unit-field-legend");
@@ -2185,7 +2186,9 @@ subjectSelect.addEventListener("change", () => {
   sixthGradeMathLevelField.hidden = gradeSelect.value !== "小6" || subjectSelect.value !== "math";
   renderUnits();
 });
-sixthGradeMathLevelSelect.addEventListener("change", () => {
+function updateSixthGradeMathLevel() {
+  if (renderedSixthGradeMathLevel === sixthGradeMathLevelSelect.value) return;
+  renderedSixthGradeMathLevel = sixthGradeMathLevelSelect.value;
   const unitCheckboxes = [...unitOptions.querySelectorAll("input[type='checkbox']")];
   const allUnitsSelected = unitCheckboxes.length > 0 && unitCheckboxes.every((checkbox) => checkbox.checked);
   yamaguchiPrepNote.hidden = sixthGradeMathLevelSelect.value !== "entrance";
@@ -2203,7 +2206,9 @@ sixthGradeMathLevelSelect.addEventListener("change", () => {
       [...unitOptions.querySelectorAll("input[type='checkbox']")].some((checkbox) => !checkbox.checked)) {
     toggleAllUnits();
   }
-});
+}
+sixthGradeMathLevelSelect.addEventListener("input", updateSixthGradeMathLevel);
+sixthGradeMathLevelSelect.addEventListener("change", updateSixthGradeMathLevel);
 questionCountInput.addEventListener("change", updateQuestionCountLimit);
 unitSelectAllButton.addEventListener("click", toggleAllUnits);
 document.querySelector("#start-button").addEventListener("click", startQuiz);
